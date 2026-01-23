@@ -1,3 +1,5 @@
+import { Survey } from "./pages/Survey";
+
 export function App() {
-  return <div className="">chefcito</div>;
+  return <Survey />;
 }
