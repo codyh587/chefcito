@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import {
   Cake,
-  ChefHat,
   ChevronRight,
   Drumstick,
   Flame,
@@ -126,9 +125,9 @@ export function Survey({ onComplete }: Props) {
         <motion.div
           animate={{ rotate: [10, -10, 10] }}
           transition={{ duration: 4, repeat: Infinity }}
-          className="m-auto h-20 w-20 rounded-full border-4 border-white bg-linear-to-br from-yellow-300 via-orange-500 to-pink-500 to-85% text-white shadow-lg"
+          className="m-auto h-20 w-20 rounded-full shadow-lg"
         >
-          <ChefHat className="mx-auto mt-2.5 h-12 w-12" />
+          <img src="logo.svg" />
         </motion.div>
 
         {/* header */}
