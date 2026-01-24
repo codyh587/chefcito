@@ -15,7 +15,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { FoodPreferences } from "../types/FoodPreferences.tsx";
 
 type Question = {
-  id: keyof FoodPreferences;
+  id?: keyof FoodPreferences;
   question: string;
   icon: React.ReactNode;
   options: { value: string; label: string; emoji: string }[];
@@ -78,61 +78,71 @@ const questions: Question[] = [
       { value: "both", label: "Maestro de Todo", emoji: "👑" },
     ],
   },
+  {
+    id: "cuisine",
+    question: "¡Listo para la batalla culinaria!",
+    icon: <Sparkles className="h-8 w-8" />,
+    options: [],
+  },
 ];
 
 type Props = {
   onComplete?: (preferences: FoodPreferences) => void;
 };
 
-export function Survey({ onComplete = () => {} }: Props) {
+export function Survey({ onComplete }: Props) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Partial<FoodPreferences>>({});
   const [selectedOption, setSelectedOption] = useState<string>("");
 
   const question = questions[currentQuestion];
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
+  const progress = (currentQuestion / (questions.length - 1)) * 100;
 
   const handleSelect = (value: string) => {
     setSelectedOption(value);
 
     setTimeout(() => {
-      const newAnswers = { ...answers, [question.id]: value };
+      const newAnswers = { ...answers, [question.id!]: value };
       setAnswers(newAnswers);
 
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
         setSelectedOption("");
       } else {
-        onComplete(newAnswers as FoodPreferences);
+        onComplete ?? (newAnswers as FoodPreferences);
       }
     }, 500);
   };
 
   return (
-    <div className="h-full min-h-screen bg-linear-to-br from-red-600 via-yellow-400 to-green-600 p-10">
+    <div className="h-full min-h-screen bg-linear-to-br from-red-600 via-yellow-400 to-green-600 px-10 py-6">
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="flex flex-col justify-center gap-y-5 overflow-y-auto text-center"
+        className="flex flex-col items-stretch gap-y-5 overflow-x-hidden overflow-y-auto text-center"
       >
+        {/* logo */}
         <motion.div
           animate={{ rotate: [10, -10, 10] }}
           transition={{ duration: 4, repeat: Infinity }}
-          className="m-auto h-20 w-20 rounded-full border-4 border-white bg-linear-to-br from-yellow-400 via-red-500 to-pink-500 text-white shadow-2xl"
+          className="m-auto h-20 w-20 rounded-full border-4 border-white bg-linear-to-br from-yellow-300 via-orange-500 to-pink-500 to-85% text-white shadow-lg"
         >
           <ChefHat className="mx-auto mt-2.5 h-12 w-12" />
         </motion.div>
+
+        {/* header */}
         <motion.h1
           initial={{ y: -20 }}
           animate={{ y: 0 }}
-          className="mb-1 text-4xl font-black text-white drop-shadow-lg"
+          className="text-3xl font-black text-white"
           style={{ textShadow: "3px 3px 0 rgba(0,0,0,0.3)" }}
         >
-          LUCHA SABOR
+          ¡BIENVENIDO A CHEFCITO!
         </motion.h1>
 
-        <div className="h-3 overflow-hidden rounded-full border-2 border-white bg-white/30">
+        {/* progress bar */}
+        <div className="h-3.5 overflow-hidden rounded-full border-2 border-white bg-white/30">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -141,7 +151,7 @@ export function Survey({ onComplete = () => {} }: Props) {
           />
         </div>
 
-        {/* Question Card */}
+        {/* question card */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuestion}
@@ -149,16 +159,10 @@ export function Survey({ onComplete = () => {} }: Props) {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
             transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            className="rounded-3xl border-4 border-yellow-400 bg-white p-5 shadow-2xl"
+            className="rounded-3xl border-4 border-yellow-300 bg-white p-5"
           >
-            <div className="mb-5 flex flex-col items-center justify-center gap-3">
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="text-red-600"
-              >
-                {question.icon}
-              </motion.div>
+            <div className="mb-5 flex flex-col items-center justify-center gap-3 text-red-500">
+              {question.icon}
               <h2 className="text-center text-xl leading-tight font-black text-gray-900">
                 {question.question}
               </h2>
