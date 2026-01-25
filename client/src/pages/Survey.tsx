@@ -3,21 +3,24 @@ import { useState } from "react";
 import { ChevronRight, Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import logo from "../assets/logo.svg";
-import type { FoodPreferences } from "../types/FoodPreferences.tsx";
+import logo from "@/assets/logo.svg";
+import {
+  type FoodPreferences,
+  useFoodPreferences,
+} from "@/contexts/FoodPreferencesContext";
 
 type Question = {
-  id?: keyof FoodPreferences;
+  id: keyof FoodPreferences;
   question: string;
-  icon: string;
-  options: { value: string; label: string; emoji: string }[];
+  emoji: string;
+  options: { value: any; label: string; emoji: string }[];
 };
 
 const questions: Question[] = [
   {
     id: "spiceLevel",
     question: "¿Cuál es tu nivel de fuego?",
-    icon: "🔥",
+    emoji: "🔥",
     options: [
       { value: "mild", label: "El Suave", emoji: "😌" },
       { value: "medium", label: "El Valiente", emoji: "😤" },
@@ -28,7 +31,7 @@ const questions: Question[] = [
   {
     id: "mealType",
     question: "¿Cuándo entras al ring de sabor?",
-    icon: "🍽️",
+    emoji: "🍽️",
     options: [
       { value: "breakfast", label: "Batalla del Amanecer", emoji: "🌅" },
       { value: "lunch", label: "Combate del Mediodía", emoji: "☀️" },
@@ -39,7 +42,7 @@ const questions: Question[] = [
   {
     id: "protein",
     question: "¿Cuál es tu compañero de batalla?",
-    icon: "🍗",
+    emoji: "🍗",
     options: [
       { value: "chicken", label: "Pollo Power", emoji: "🐔" },
       { value: "beef", label: "Toro Fuerte", emoji: "🥩" },
@@ -51,7 +54,7 @@ const questions: Question[] = [
   {
     id: "cuisine",
     question: "¿En qué arena peleas?",
-    icon: "🌎",
+    emoji: "🌎",
     options: [
       { value: "mexican", label: "La Arena Mexicana", emoji: "🌮" },
       { value: "italian", label: "El Coliseo Italiano", emoji: "🍝" },
@@ -63,7 +66,7 @@ const questions: Question[] = [
   {
     id: "sweetOrSavory",
     question: "¿Dulce o Salado, luchador?",
-    icon: "🎂",
+    emoji: "🎂",
     options: [
       { value: "sweet", label: "Dulce Destructor", emoji: "🍰" },
       { value: "savory", label: "Salado Supremo", emoji: "🧀" },
@@ -71,40 +74,38 @@ const questions: Question[] = [
     ],
   },
   {
-    id: "cuisine",
+    id: "surveyFinished",
     question: "¡Listo para la batalla culinaria!",
-    icon: "✨",
-    options: [],
+    emoji: "✨",
+    options: [{ value: true, label: "Let's go!", emoji: "👊" }],
   },
 ];
 
-type Props = {
-  onComplete?: (preferences: FoodPreferences) => void;
-};
+export function Survey() {
+  const { updatePreferences } = useFoodPreferences();
 
-export function Survey({ onComplete }: Props) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedOption, setSelectedOption] = useState("");
   const [answers, setAnswers] = useState<Partial<FoodPreferences>>({});
-  const [selectedOption, setSelectedOption] = useState<string>("");
 
   const question = questions[currentQuestion];
   const progress = (currentQuestion / (questions.length - 1)) * 100;
 
-  const handleSelect = (value: string) => {
+  function handleSelect(value: string) {
     setSelectedOption(value);
 
     setTimeout(() => {
-      const newAnswers = { ...answers, [question.id!]: value };
-      setAnswers(newAnswers);
+      const newAnswers = { ...answers, [question.id]: value };
 
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
         setSelectedOption("");
+        setAnswers(newAnswers);
       } else {
-        onComplete ?? (newAnswers as FoodPreferences);
+        updatePreferences({ ...newAnswers, surveyFinished: true });
       }
     }, 500);
-  };
+  }
 
   return (
     <div className="flex h-full min-h-screen items-center justify-stretch bg-linear-to-br from-red-600 via-yellow-400 to-green-600 px-10 py-6">
@@ -149,7 +150,7 @@ export function Survey({ onComplete }: Props) {
             transition={{ type: "spring", stiffness: 200, damping: 25 }}
             className="rounded-3xl border-4 border-yellow-300 bg-white p-5"
           >
-            <div className="text-5xl">{question.icon}</div>
+            <div className="text-5xl">{question.emoji}</div>
             <div className="mt-2.5 mb-6 text-xl font-bold text-gray-800">
               {question.question}
             </div>

@@ -8,7 +8,7 @@
     "^(react-dom/(.*)$)|^(react-dom$)",
     "<THIRD_PARTY_MODULES>",
     "^@/components/(.*)$",
-    "^@/utils/(.*)$",
+    "^@/(.*)$",
     "^[./]"
   ],
   "importOrderSeparation": true,
