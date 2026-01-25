@@ -2,10 +2,11 @@
 
 Installed plugins:
 
-- ESLint
+- ShadCN
 - Tailwind
-- Prettier with Import/Tailwind formatting
-- ShadCN UI Library
+- Framer Motion
+- ESLint
+- Prettier with import/Tailwind formatting
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
