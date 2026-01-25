@@ -163,7 +163,7 @@ export function Survey() {
                       selectedOption === option.value
                         ? "border-green-500 bg-green-100 text-green-800"
                         : "border-gray-300 bg-linear-to-r from-yellow-50 to-red-50 text-gray-800 active:border-yellow-300"
-                    } `}
+                    }`}
                   >
                     <div className="shrink-0 text-3xl">{option.emoji}</div>
                     <div className="flex-1 text-lg">{option.label}</div>
