@@ -96,7 +96,6 @@ export function Survey() {
 
     setTimeout(() => {
       const newAnswers = { ...answers, [question.id]: value };
-
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
         setSelectedOption("");
@@ -108,10 +107,18 @@ export function Survey() {
   }
 
   return (
-    <div className="flex h-full min-h-screen items-center justify-stretch bg-linear-to-br from-red-600 via-yellow-400 to-green-600 px-10 py-6">
+    <motion.div
+      key={1}
+      initial={{ x: "100%" }}
+      animate={{ x: 0 }}
+      exit={{ x: "-100%" }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+      className="absolute inset-0 flex h-full min-h-screen items-center justify-stretch bg-linear-to-br from-red-600 via-yellow-400 to-green-600 px-10 py-6"
+    >
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
+        exit={{ x: -300, opacity: 0 }}
         transition={{ duration: 0.6 }}
         className="flex w-full flex-col gap-y-5 overflow-x-hidden overflow-y-auto text-center"
       >
@@ -184,6 +191,6 @@ export function Survey() {
           </motion.div>
         </AnimatePresence>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
