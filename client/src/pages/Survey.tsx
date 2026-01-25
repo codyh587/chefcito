@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ChevronRight, Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
+import logo from "../assets/logo.svg";
 import type { FoodPreferences } from "../types/FoodPreferences.tsx";
 
 type Question = {
@@ -118,7 +119,7 @@ export function Survey({ onComplete }: Props) {
           animate={{ rotate: [10, -10, 10] }}
           transition={{ duration: 4, repeat: Infinity }}
           className="m-auto h-20 w-20 rounded-full shadow-lg"
-          src="logo.svg"
+          src={logo}
         />
         {/* header */}
         <motion.div
