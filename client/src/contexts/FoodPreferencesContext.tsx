@@ -1,5 +1,5 @@
 import {
-  type ReactNode,
+  type PropsWithChildren,
   createContext,
   useContext,
   useEffect,
@@ -27,7 +27,7 @@ const FoodPreferencesContext = createContext<
   FoodPreferencesContextType | undefined
 >(undefined);
 
-export function FoodPreferencesProvider({ children }: { children: ReactNode }) {
+export function FoodPreferencesProvider({ children }: PropsWithChildren) {
   const [preferences, setPreferences] = useState<Partial<FoodPreferences>>(
     () => {
       try {
