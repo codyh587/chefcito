@@ -39,10 +39,11 @@ class IntentBody(BaseModel):
     spice: float
     protein_filled: bool
     loose: bool
+    num_reccomendations: int = 3  # default is 3 for now
 
 @app.post("/recommend")
 def post_recommend(body: IntentBody):
-    r = recommend(RECIPES, body.model_dump(), RANKER, [])[0:2]
+    r = recommend(RECIPES, body.model_dump(), RANKER, [], body.num_reccomendations)
     return r
 
 # please don't write the entire backend in a single file. however,

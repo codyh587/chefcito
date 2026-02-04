@@ -194,7 +194,7 @@ def recipe_similarity(a, b):
     return len(a & b) / len(a | b)
 
 
-def diversify(indices, metas, k=10, max_sim=0.7):
+def diversify(indices, metas, k=10, max_sim=0.3):
     selected = []
     for c in indices:
         if all(
