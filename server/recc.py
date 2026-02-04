@@ -11,7 +11,6 @@ from collections import Counter
 # 1) Index the recipes so it easier to keep track of the users prev prefences.
 # 2) Find a way to make this quicker server-side,
 #  so that we arent scanning thru recipes each run
-# 3) create API Endpoints for this function to use
 # 4) think about two more latent varaibles and which will be the best to implement
 # e.g., time of day, sounds great but WHAT makes a food breakfast v. dinner,
 # some people like pancakes for dinner, others steak for breakfast
@@ -20,7 +19,7 @@ from collections import Counter
 # follow that feeling for just KOSHER and VEGETARIAN
 # (not vegan, our dataset labels vegetarian), Kosher is a nice challenge
 # 6) 7 💯
-# 8) More cleaning to ingrentients list
+# 8) More cleaning to ingrentients list (data-cleaner needs final touches)
 RECIPES = []
 with open("clean_recipes.jsonl", encoding="utf-8") as f:
     for line in f:

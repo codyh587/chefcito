@@ -1,5 +1,13 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import json
+from recc import Ranker, recommend
+
+RECIPES = []
+with open("clean_recipes.jsonl", encoding="utf-8") as f:
+    for line in f:
+        RECIPES.append(json.loads(line))
+RANKER = Ranker()
 
 # run start_server.bat and go to localhost:8000/docs to test the api
 app = FastAPI()
@@ -22,6 +30,20 @@ class EchoBody(BaseModel):
 def post_echo(body: EchoBody):
     return {"field1": body.field1, "field2": body.field2}
 
+class IntentBody(BaseModel):
+    ingredients: set[str]
+    allergens: set[str]
+    pastry: bool
+    max_prep_time: int
+    max_cook_time: int
+    spice: float
+    protein_filled: bool
+    loose: bool
+
+@app.post("/recommend")
+def post_recommend(body: IntentBody):
+    r = recommend(RECIPES, body.model_dump(), RANKER, [])[0:2]
+    return r
 
 # please don't write the entire backend in a single file. however,
 # it's more convenient for fastapi to put all the endpoint declarations here.
