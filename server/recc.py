@@ -37,7 +37,7 @@ ALLERGEN_MAP = {
 
 def contains_allergen(ingredients, blocked):
     """
-    This functions returns a boolean, given a list of 
+    This functions returns a boolean, given a list of
     ingredients, returns False if the given list does NOT
     contain any allergents that are provided.
 
@@ -245,33 +245,35 @@ def recommend(recipes, intent, ranker, liked_recipes, k=10):
 # ============================================================
 # EXAMPLE
 # ============================================================
-liked_recipes = [  # tell diego to index
-    RECIPES[3],
-    RECIPES[17],
-    RECIPES[42]
-]  # 8) previous likes
 
-intent = {
-    "ingredients": {"ground beef", "potatoe", "tomato sauce", "onion", "garlic", "jalapeno"},  # var 1
-    "allergens": {"nuts", "soy"},  # var 2
-    "pastry": False,  # var 3
-    "max_prep_time": 40,  # var 4
-    "max_cook_time": 60,  # var 5
-    "spice": 0.3,  # var 6
-    "protein_filled": True,  # 7) update to dietary restriction
-    "loose": True # 
-}
-# future plans to add more restriction, Kosher, Vegan, Vegatian
+if __name__ == "__main__":
+    liked_recipes = [  # tell diego to index
+        RECIPES[3],
+        RECIPES[17],
+        RECIPES[42]
+    ]  # 8) previous likes
+
+    intent = {
+        "ingredients": {"ground beef", "potatoe", "tomato sauce", "onion", "garlic", "jalapeno"},  # var 1
+        "allergens": {"nuts", "soy"},  # var 2
+        "pastry": False,  # var 3
+        "max_prep_time": 40,  # var 4
+        "max_cook_time": 60,  # var 5
+        "spice": 0.3,  # var 6
+        "protein_filled": True,  # 7) update to dietary restriction
+        "loose": True #
+    }
+    # future plans to add more restriction, Kosher, Vegan, Vegatian
 
 
-ranker = Ranker()
+    ranker = Ranker()
 
-results = recommend(
-    RECIPES,
-    intent,
-    ranker,
-    liked_recipes
-)
+    results = recommend(
+        RECIPES,
+        intent,
+        ranker,
+        liked_recipes
+    )
 
-for r in results:
-    print("•", r["recipe_title"])
+    for r in results:
+        print("•", r["recipe_title"])
