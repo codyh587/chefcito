@@ -30,6 +30,7 @@ class EchoBody(BaseModel):
 def post_echo(body: EchoBody):
     return {"field1": body.field1, "field2": body.field2}
 
+
 class IntentBody(BaseModel):
     ingredients: set[str]
     allergens: set[str]
@@ -41,10 +42,12 @@ class IntentBody(BaseModel):
     loose: bool
     num_reccomendations: int = 3  # default is 3 for now
 
+
 @app.post("/recommend")
 def post_recommend(body: IntentBody):
     r = recommend(RECIPES, body.model_dump(), RANKER, [], body.num_reccomendations)
     return r
+
 
 # please don't write the entire backend in a single file. however,
 # it's more convenient for fastapi to put all the endpoint declarations here.

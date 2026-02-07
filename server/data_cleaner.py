@@ -44,12 +44,27 @@ for entry in ingredients:
 # Next remove units
 
 UNITS = [
-    "cup", "cups", "tbsp", "tablespoon", "tablespoons",
-    "tsp", "teaspoon", "teaspoons",
-    "oz", "ounce", "ounces",
-    "g", "kg", "ml", "l",
-    "lb", "lbs", "pound", "pounds",
-    "box", "fluid"
+    "cup",
+    "cups",
+    "tbsp",
+    "tablespoon",
+    "tablespoons",
+    "tsp",
+    "teaspoon",
+    "teaspoons",
+    "oz",
+    "ounce",
+    "ounces",
+    "g",
+    "kg",
+    "ml",
+    "l",
+    "lb",
+    "lbs",
+    "pound",
+    "pounds",
+    "box",
+    "fluid",
 ]
 
 unit_regex = r"\b(" + "|".join(UNITS) + r")\b"
@@ -71,17 +86,25 @@ for entry in noUnits:
 # Next remove parens and whatever they have inside
 noParens = []
 for entry in noPhrases:
-    result = [re.sub(r"\([^)]*\)", "", text).strip() for text in entry]  # remove things like "(bla bla bla)"
-    result = [re.sub(r"^(.+?)\s*\(.*", "", text).strip() for text in result]  # convert "sugar (or honey" -> "sugar"
+    result = [
+        re.sub(r"\([^)]*\)", "", text).strip() for text in entry
+    ]  # remove things like "(bla bla bla)"
+    result = [
+        re.sub(r"^(.+?)\s*\(.*", "", text).strip() for text in result
+    ]  # convert "sugar (or honey" -> "sugar"
     result = [re.sub(r"\(", "", text).strip() for text in result]  # remove remaining (
-    result = [re.sub(r"^.*?\)\s*(.+)$", r"\1", text).strip() for text in result]  # convert "-piece) chocolate" --> "chocolate"
+    result = [
+        re.sub(r"^.*?\)\s*(.+)$", r"\1", text).strip() for text in result
+    ]  # convert "-piece) chocolate" --> "chocolate"
     result = [re.sub(r"\)", "", text).strip() for text in result]  # remove remaining )
     noParens.append(result)
 
 # Next remove those unicodes
 noUnicodes = []
 for entry in noParens:
-    result = [re.sub(r"[^\x00-\x7F]", "", text).strip() for text in entry]  # removes everything that isn't in ascii range x00 to x7f
+    result = [
+        re.sub(r"[^\x00-\x7F]", "", text).strip() for text in entry
+    ]  # removes everything that isn't in ascii range x00 to x7f
     noUnicodes.append(result)
 
 # with open("ingredients4.jsonl", "w") as f:
