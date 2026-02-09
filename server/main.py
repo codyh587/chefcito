@@ -1,16 +1,10 @@
+import json
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import json
-from recc import Ranker, recommend
 
-
-RECIPES = []
-RANKER = Ranker()
-
-with open("clean_recipes.jsonl", encoding="utf-8") as f:
-    for line in f:
-        RECIPES.append(json.loads(line))
+from recommender import Ranker, recommend
 
 
 app = FastAPI()
@@ -26,19 +20,35 @@ app.add_middleware(
 )
 
 
-class IntentBody(BaseModel):
+recipes = []
+ranker = Ranker()
+
+with open("clean_recipes.jsonl", encoding="utf-8") as fin:
+    for line in fin:
+        recipes.append(json.loads(line))
+
+
+class RecommendBody(BaseModel):
     ingredients: set[str]
     allergens: set[str]
     pastry: bool
-    max_prep_time: int
+    max_num_ingredients: int
     max_cook_time: int
     spice: float
     protein_filled: bool
     loose: bool
-    num_reccomendations: int = 3  # default is 3 for now
+    limit: int
 
 
 @app.post("/recommend")
-def post_recommend(body: IntentBody):
-    r = recommend(RECIPES, body.model_dump(), RANKER, [], body.num_reccomendations)
-    return {"data": r}
+def post_recommend(body: RecommendBody):
+    return {
+        "data": recommend(
+            recipes=recipes,
+            intent=body.model_dump(),
+            ranker=ranker,
+            liked=[],
+            disliked=[],
+            k=body.limit,
+        )
+    }

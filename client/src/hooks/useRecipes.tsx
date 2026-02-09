@@ -16,7 +16,7 @@ export type Recipe = {
 
 export function useRecipes() {
   const { preferences } = useFoodPreferences();
-  const { ingredients } = useIngredients();
+  const { ingredientsString } = useIngredients();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
 
   const getRecipes = useCallback(async () => {
@@ -25,25 +25,24 @@ export function useRecipes() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ingredients: Array.from(ingredients),
+          ingredients: ingredientsString,
           allergens: [],
           pastry: false,
-          max_prep_time: 100,
+          max_num_ingredients: 100,
           max_cook_time: 100,
           spice: 1,
           protein_filled: false,
           loose: true,
-          num_reccomendations: 5,
+          limit: 5,
         }),
       });
-
-      const data = await response.json();
-      console.log(data);
-      setRecipes(data.data);
+      const body = await response.json();
+      setRecipes(body.data || []);
     } catch (error) {
       console.error("Failed to fetch recipes:", error);
+      setRecipes([]);
     }
-  }, [ingredients, preferences]);
+  }, [ingredientsString, preferences]);
 
   function clearRecipes() {
     setRecipes([]);
