@@ -1,16 +1,29 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 from recc import Ranker, recommend
 
+
 RECIPES = []
+RANKER = Ranker()
+
 with open("clean_recipes.jsonl", encoding="utf-8") as f:
     for line in f:
         RECIPES.append(json.loads(line))
-RANKER = Ranker()
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class IntentBody(BaseModel):
@@ -28,4 +41,4 @@ class IntentBody(BaseModel):
 @app.post("/recommend")
 def post_recommend(body: IntentBody):
     r = recommend(RECIPES, body.model_dump(), RANKER, [], body.num_reccomendations)
-    return r
+    return {"data": r}

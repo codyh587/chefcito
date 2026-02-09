@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useIngredients } from "@/hooks/useIngredients";
@@ -21,7 +21,7 @@ export function useRecipes() {
 
   const getRecipes = useCallback(async () => {
     try {
-      const response = await fetch("/api/recommend", {
+      const response = await fetch("http://localhost:8000/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -30,14 +30,16 @@ export function useRecipes() {
           pastry: false,
           max_prep_time: 100,
           max_cook_time: 100,
-          spice: 0,
-          protein_filled: preferences?.protein || false,
+          spice: 1,
+          protein_filled: false,
           loose: true,
           num_reccomendations: 5,
         }),
       });
+
       const data = await response.json();
-      setRecipes(data);
+      console.log(data);
+      setRecipes(data.data);
     } catch (error) {
       console.error("Failed to fetch recipes:", error);
     }
@@ -46,6 +48,12 @@ export function useRecipes() {
   function clearRecipes() {
     setRecipes([]);
   }
+
+  useEffect(() => {
+    setTimeout(() => {
+      getRecipes();
+    }, 0);
+  }, [getRecipes]);
 
   return {
     recipes,
