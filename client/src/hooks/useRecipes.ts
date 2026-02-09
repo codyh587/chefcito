@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { useFoodPreferences } from "@/contexts/useFoodPreferences";
+import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useIngredients } from "@/hooks/useIngredients";
 
 export type Recipe = {
@@ -33,7 +33,7 @@ export function useRecipes() {
             max_cook_time: 100,
             spice: 1,
             protein_filled: true,
-            loose: true,
+            loose: false,
             limit: resultLimit,
           }),
         });

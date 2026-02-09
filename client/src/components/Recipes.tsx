@@ -8,7 +8,7 @@ export function Recipes() {
   return (
     <div className="flex-1">
       <h1 className="m-auto text-2xl font-bold">Recipes</h1>
-      <Button onClick={() => getRecipes} className="mt-4">
+      <Button onClick={() => getRecipes()} className="mt-4">
         Get Recipes
       </Button>
       <Button onClick={clearRecipes} className="mt-2">
