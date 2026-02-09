@@ -82,7 +82,7 @@ export function Pantry() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 basis-0 space-y-3 overflow-y-scroll">
+        <div className="flex-1 basis-0 space-y-3 overflow-y-auto">
           <AnimatePresence>
             {ingredients.map((item) => (
               <motion.div
@@ -99,9 +99,9 @@ export function Pantry() {
                 </div>
                 <button
                   onClick={() => removeIngredient(item)}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-300"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
                 >
-                  <X className="h-5 w-5 text-white" />
+                  <X className="h-5 w-5" />
                 </button>
               </motion.div>
             ))}
