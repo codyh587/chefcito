@@ -43,9 +43,9 @@ export function useRecipes() {
     }
   }, [ingredients, preferences]);
 
-  const clearRecipes = useCallback(() => {
+  function clearRecipes() {
     setRecipes([]);
-  }, []);
+  }
 
   return {
     recipes,

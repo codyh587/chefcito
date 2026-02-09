@@ -1,23 +1,31 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
+
+export type Ingredient = {
+  name: string;
+  emoji: string;
+};
 
 export function useIngredients() {
-  const [ingredients, setIngredients] = useState<Set<string>>(new Set());
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
-  const addIngredients = useCallback((newIngredients: string[]) => {
-    setIngredients((prev) => new Set([...prev, ...newIngredients]));
-  }, []);
+  function hasIngredient(ingredient: Ingredient) {
+    return ingredients.some((item) => item.name === ingredient.name);
+  }
 
-  const removeIngredients = useCallback((ingredientsToRemove: string[]) => {
-    setIngredients((prev) => {
-      const updated = new Set(prev);
-      ingredientsToRemove.forEach((ing) => updated.delete(ing));
-      return updated;
-    });
-  }, []);
+  function addIngredient(newIngredient: Ingredient) {
+    setIngredients((prev) => [...prev, newIngredient]);
+  }
+
+  function removeIngredient(ingredientToRemove: Ingredient) {
+    setIngredients((prev) =>
+      prev.filter((ingredient) => ingredient.name !== ingredientToRemove.name),
+    );
+  }
 
   return {
     ingredients,
-    addIngredients,
-    removeIngredients,
+    hasIngredient,
+    addIngredient,
+    removeIngredient,
   };
 }

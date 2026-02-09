@@ -2,29 +2,36 @@ import { useEffect, useMemo, useState } from "react";
 
 import Fuse from "fuse.js";
 
+import type { Ingredient } from "@/hooks/useIngredients";
+
+type IngredientData = Record<string, string>;
+
 export function useIngredientSearch(resultLimit: number = 10) {
-  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [ingredientData, setIngredientData] = useState<IngredientData>({});
   const [query, setQuery] = useState<string>("");
 
   useEffect(() => {
     fetch("/ingredients.json")
       .then((res) => res.json())
-      .then((data) => setIngredients(Array.from(new Set(data))))
+      .then((data) => setIngredientData(data))
       .catch((err) => console.error("Failed to load ingredients:", err));
   }, []);
 
   const fuse = useMemo(
-    () => new Fuse(ingredients, { threshold: 0.3 }),
-    [ingredients],
+    () => new Fuse(Object.keys(ingredientData), { threshold: 0.3 }),
+    [ingredientData],
   );
 
   const results = useMemo(
     () =>
       fuse
         .search(query)
-        .map((r) => r.item)
+        .map(
+          (r) =>
+            ({ name: r.item, emoji: ingredientData[r.item] }) as Ingredient,
+        )
         .slice(0, resultLimit),
-    [query, fuse, resultLimit],
+    [query, fuse, resultLimit, ingredientData],
   );
 
   return { query, setQuery, results };

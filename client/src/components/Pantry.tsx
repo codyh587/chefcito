@@ -5,12 +5,13 @@ import SearchAsset from "@/assets/search.svg";
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useIngredientSearch } from "@/hooks/useIngredientSearch";
 import { useIngredients } from "@/hooks/useIngredients";
-import { toProperCase } from "@/lib/topropercase";
+import { toProperCase } from "@/lib/toProperCase";
 
 export function Pantry() {
   const { clearPreferences } = useFoodPreferences();
   const { query, setQuery, results } = useIngredientSearch();
-  const { ingredients, addIngredients, removeIngredients } = useIngredients();
+  const { ingredients, hasIngredient, addIngredient, removeIngredient } =
+    useIngredients();
 
   return (
     <div className="flex flex-1 flex-col gap-y-5 p-5">
@@ -46,15 +47,17 @@ export function Pantry() {
               <div className="max-h-60 overflow-y-auto">
                 {results.map((item) => (
                   <button
-                    key={item}
-                    onClick={() => addIngredients([item])}
-                    className="flex w-full items-center gap-3 border-b p-3 transition-colors duration-300 outline-none active:bg-yellow-50"
+                    key={item.name}
+                    onClick={() => addIngredient(item)}
+                    className="flex w-full items-center gap-x-2 border-b p-3 transition-colors duration-300 outline-none active:bg-yellow-50"
                   >
-                    <div className="text-2xl">•</div>
-                    <div className="flex-1 text-left text-lg font-medium">
-                      {toProperCase(item)}
+                    <div className="-translate-y-0.5 text-3xl">
+                      {item.emoji}
                     </div>
-                    {ingredients.has(item) ? (
+                    <div className="flex-1 text-left text-lg font-medium">
+                      {toProperCase(item.name)}
+                    </div>
+                    {hasIngredient(item) ? (
                       <Check className="h-5 text-green-500" />
                     ) : (
                       <Plus className="text-muted-foreground h-5" />
@@ -67,7 +70,7 @@ export function Pantry() {
         </AnimatePresence>
       </div>
       {/* ingredients list */}
-      {ingredients.size === 0 ? (
+      {ingredients.length === 0 ? (
         <div className="m-auto text-center">
           <img
             src={SearchAsset}
@@ -81,20 +84,21 @@ export function Pantry() {
       ) : (
         <div className="flex-1 basis-0 space-y-3 overflow-y-scroll">
           <AnimatePresence>
-            {Array.from(ingredients).map((item) => (
+            {ingredients.map((item) => (
               <motion.div
-                key={item}
+                key={item.name}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 600, damping: 50 }}
-                className="flex w-full items-center gap-3 rounded-2xl border-4 border-green-500 bg-linear-to-r from-green-50 to-green-100 p-2 pl-3.5"
+                className="flex w-full items-center gap-x-2 rounded-2xl border-4 border-green-500 bg-linear-to-r from-green-50 to-green-100 p-2"
               >
+                <div className="-translate-y-0.5 text-3xl">{item.emoji}</div>
                 <div className="flex-1 truncate text-lg font-medium">
-                  {toProperCase(item)} rainbowlaterpls
+                  {toProperCase(item.name)}
                 </div>
                 <button
-                  onClick={() => removeIngredients([item])}
+                  onClick={() => removeIngredient(item)}
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-300"
                 >
                   <X className="h-5 w-5 text-white" />
