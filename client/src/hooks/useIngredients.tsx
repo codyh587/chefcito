@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const LOCAL_STORAGE_KEY = "chefcito_ingredients";
 
 export type Ingredient = {
   name: string;
@@ -6,7 +8,25 @@ export type Ingredient = {
 };
 
 export function useIngredients() {
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>(() => {
+    try {
+      const storedPreferences = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedPreferences) {
+        return JSON.parse(storedPreferences);
+      }
+    } catch (error) {
+      console.error("Error loading ingredients from cache:", error);
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(ingredients));
+    } catch (error) {
+      console.error("Error saving preferences to cache:", error);
+    }
+  }, [ingredients]);
 
   function hasIngredient(ingredient: Ingredient) {
     return ingredients.some((item) => item.name === ingredient.name);
