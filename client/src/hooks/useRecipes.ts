@@ -53,7 +53,7 @@ export function useRecipes() {
             max_cook_time: 100,
             spice: 1,
             protein_filled: true,
-            loose: false,
+            loose: true,
             limit: resultLimit,
           }),
         });

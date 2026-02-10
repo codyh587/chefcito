@@ -21,8 +21,6 @@ app.add_middleware(
 
 
 recipes = []
-ranker = Ranker()
-
 with open("clean_recipes.jsonl", encoding="utf-8") as fin:
     for line in fin:
         recipes.append(json.loads(line))
@@ -46,7 +44,7 @@ def post_recommend(body: RecommendBody):
         "data": recommend(
             recipes=recipes,
             intent=body.model_dump(),
-            ranker=ranker,
+            ranker=Ranker(),
             liked=[],
             disliked=[],
             k=body.limit,
