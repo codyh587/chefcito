@@ -128,7 +128,7 @@ export function Recipes() {
                 <DialogHeader className="text-left text-lg font-semibold">
                   Directions
                 </DialogHeader>
-                <ol className="list-decimal space-y-1.5 pl-4 text-sm">
+                <ol className="list-decimal space-y-1.5 pb-1.5 pl-4 text-sm">
                   {recipe.directions.map((item, index) => (
                     <li key={index}>{item}</li>
                   ))}
