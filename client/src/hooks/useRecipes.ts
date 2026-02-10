@@ -1,7 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useIngredients } from "@/hooks/useIngredients";
+
+const LOCAL_STORAGE_KEY = "chefcito_recipes";
 
 export type Recipe = {
   recipe_title: string;
@@ -17,7 +19,25 @@ export type Recipe = {
 export function useRecipes() {
   const { preferences } = useFoodPreferences();
   const { ingredientsString } = useIngredients();
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>(() => {
+    try {
+      const storedRecipes = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedRecipes) {
+        return JSON.parse(storedRecipes);
+      }
+    } catch (error) {
+      console.error("Error loading recipes from cache:", error);
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(recipes));
+    } catch (error) {
+      console.error("Error saving preferences to cache:", error);
+    }
+  }, [recipes]);
 
   const getRecipes = useCallback(
     async (resultLimit: number = 10) => {

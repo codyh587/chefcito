@@ -17,7 +17,7 @@ export function Pantry() {
     <div className="flex flex-1 flex-col gap-y-5 p-5">
       {/* header */}
       <div className="flex items-center">
-        <div className="text-3xl font-medium">My Pantry</div>
+        <div className="text-3xl font-medium">Pantry</div>
         <ScrollText
           onClick={clearPreferences}
           size="1.75rem"
