@@ -1,7 +1,12 @@
 export function Saved() {
   return (
-    <div className="flex-1">
-      <h1 className="m-auto text-2xl font-bold">Saved</h1>
+    <div className="flex flex-1 flex-col gap-y-5 p-5">
+      {/* header */}
+      <div className="bg-chefcito -m-5 flex items-center p-5 text-white">
+        <div className="px-0.5 text-3xl font-black tracking-wide">
+          Saved
+        </div>
+      </div>
     </div>
   );
 }

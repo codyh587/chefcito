@@ -1,4 +1,4 @@
-import { Check, Plus, ScrollText, Search, X } from "lucide-react";
+import { Check, Eraser, Plus, Search, Settings, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import SearchAsset from "@/assets/search.svg";
@@ -10,30 +10,39 @@ import { toProperCase } from "@/lib/toProperCase";
 export function Pantry() {
   const { clearPreferences } = useFoodPreferences();
   const { query, setQuery, results } = useIngredientSearch();
-  const { ingredients, hasIngredient, addIngredient, removeIngredient } =
-    useIngredients();
+  const {
+    ingredients,
+    hasIngredient,
+    addIngredient,
+    removeIngredient,
+    clearIngredients,
+  } = useIngredients();
 
   return (
-    <div className="flex flex-1 flex-col gap-y-5 p-5">
+    <div className="flex flex-1 flex-col p-5 pb-0">
       {/* header */}
-      <div className="flex items-center">
-        <div className="text-3xl font-medium">Pantry</div>
-        <ScrollText
+      <div className="bg-chefcito -m-5 mb-5 flex items-center p-5 text-white">
+        <div className="px-0.5 text-3xl font-black tracking-wide">Pantry</div>
+        <Eraser
+          onClick={clearIngredients}
+          size="2rem"
+          className="mt-0.5 ml-auto text-shadow-lg"
+        />
+        <Settings
           onClick={clearPreferences}
-          size="1.75rem"
-          className="mt-0.5 mr-0.5 ml-auto"
+          size="2rem"
+          className="mt-1 ml-7 text-shadow-lg"
         />
       </div>
       {/* search box */}
-      <div className="relative">
+      <div className="relative z-10 -mb-5">
         <Search className="text-muted-foreground absolute top-1/2 left-4 h-6 -translate-y-1/2 transform" />
         <input
-          type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onBlur={() => setQuery("")}
           placeholder="Search ingredients..."
-          className="text-muted-foreground w-full rounded-3xl border-4 border-yellow-400 py-3 pr-4 pl-12 text-lg font-medium shadow-lg transition-colors duration-300 outline-none focus:border-orange-400"
+          className="text-muted-foreground bg-background w-full rounded-3xl border-4 border-yellow-400 py-3 pr-4 pl-12 text-lg font-medium transition-colors duration-500 focus:border-orange-400"
         />
         {/* search results */}
         <AnimatePresence>
@@ -42,7 +51,7 @@ export function Pantry() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full right-0 left-0 z-10 mt-2 overflow-hidden rounded-3xl border-4 border-yellow-400 bg-white shadow-2xl"
+              className="absolute top-full right-0 left-0 z-10 mt-2.5 overflow-hidden rounded-3xl border-4 border-yellow-400 bg-white shadow-2xl"
             >
               <div className="max-h-60 overflow-y-auto">
                 {results.map((item) => (
@@ -74,6 +83,7 @@ export function Pantry() {
         <div className="m-auto text-center">
           <img
             src={SearchAsset}
+            draggable={false}
             className="m-auto mb-3 h-28 rounded-full drop-shadow-lg"
           />
           <div className="mb-1 text-2xl font-medium">No ingredients yet.</div>
@@ -82,7 +92,7 @@ export function Pantry() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 basis-0 space-y-3 overflow-y-auto">
+        <div className="flex-1 basis-0 overflow-y-auto">
           <AnimatePresence>
             {ingredients.map((item) => (
               <motion.div
@@ -91,7 +101,7 @@ export function Pantry() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 600, damping: 50 }}
-                className="flex w-full items-center gap-x-2 rounded-2xl border-4 border-green-500 bg-linear-to-r from-green-50 to-green-100 p-2"
+                className="mt-3 flex w-full items-center gap-x-1.5 rounded-3xl border-4 border-green-500 bg-linear-to-r from-green-50 to-green-100 p-2 first:mt-8"
               >
                 <div className="-translate-y-0.5 text-3xl">{item.emoji}</div>
                 <div className="flex-1 truncate text-lg font-medium">
@@ -108,35 +118,6 @@ export function Pantry() {
           </AnimatePresence>
         </div>
       )}
-
-      {/* Continue Button
-      {showContinueButton && (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.6, type: "spring" }}
-          className="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pt-4 pb-6 text-center"
-        >
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={handleContinue}
-            disabled={addedItems.length === 0}
-            className={`mx-auto flex items-center gap-3 rounded-2xl border-4 border-white px-8 py-4 text-xl font-black shadow-2xl transition-all ${
-              addedItems.length > 0
-                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white active:from-purple-700 active:to-pink-700"
-                : "cursor-not-allowed bg-gray-400 text-gray-200"
-            } `}
-          >
-            <Sparkles className="h-6 w-6" />
-            ¡A LA BATALLA! ({addedItems.length})
-          </motion.button>
-          {addedItems.length === 0 && (
-            <p className="mt-2 text-sm font-bold text-gray-600">
-              Agrega al menos un ingrediente
-            </p>
-          )} */}
-      {/* </motion.div> */}
-      {/* //   )} */}
     </div>
   );
 }

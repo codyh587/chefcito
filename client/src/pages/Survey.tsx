@@ -106,7 +106,7 @@ export function Survey() {
   }
 
   return (
-    <div className="relative h-full min-h-screen w-full bg-linear-to-br from-red-600 via-yellow-400 to-green-600 p-10">
+    <div className="bg-chefcito relative h-full min-h-screen w-full p-10">
       <AnimatePresence>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -120,6 +120,7 @@ export function Survey() {
             transition={{ duration: 4, repeat: Infinity }}
             className="m-auto h-20 w-20 rounded-full shadow-lg"
             src="/logo.svg"
+            draggable={false}
           />
           {/* header */}
           <motion.div
@@ -136,7 +137,7 @@ export function Survey() {
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5 }}
-              className="h-full bg-linear-to-r from-green-400 via-yellow-400 to-red-500"
+              className="h-full bg-linear-to-r from-yellow-400 via-orange-500 to-pink-500"
             />
           </div>
           {/* question card */}
@@ -149,11 +150,13 @@ export function Survey() {
               transition={{ type: "spring", stiffness: 200, damping: 25 }}
               className="rounded-3xl border-4 border-yellow-300 bg-white p-5"
             >
+              {/* question header */}
               <div className="text-5xl">{question.emoji}</div>
               <div className="mt-2.5 mb-6 text-xl font-bold text-gray-800">
                 {question.question}
               </div>
               <div className="flex flex-col gap-y-3">
+                {/* question options */}
                 {question.options.map((option) => (
                   <motion.button
                     key={option.value}

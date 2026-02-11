@@ -27,6 +27,16 @@ const FoodPreferencesContext = createContext<
   FoodPreferencesContextType | undefined
 >(undefined);
 
+export function useFoodPreferences() {
+  const context = useContext(FoodPreferencesContext);
+  if (context === undefined) {
+    throw new Error(
+      "useFoodPreferences must be used within a FoodPreferencesProvider",
+    );
+  }
+  return context;
+}
+
 export function FoodPreferencesProvider({ children }: PropsWithChildren) {
   const [preferences, setPreferences] = useState<Partial<FoodPreferences>>(
     () => {
@@ -73,14 +83,4 @@ export function FoodPreferencesProvider({ children }: PropsWithChildren) {
       {children}
     </FoodPreferencesContext.Provider>
   );
-}
-
-export function useFoodPreferences() {
-  const context = useContext(FoodPreferencesContext);
-  if (context === undefined) {
-    throw new Error(
-      "useFoodPreferences must be used within a FoodPreferencesProvider",
-    );
-  }
-  return context;
 }

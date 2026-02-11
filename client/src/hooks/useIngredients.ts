@@ -46,11 +46,16 @@ export function useIngredients() {
     );
   }
 
+  function clearIngredients() {
+    setIngredients([]);
+  }
+
   return {
     ingredients,
     ingredientsString,
     hasIngredient,
     addIngredient,
     removeIngredient,
+    clearIngredients,
   };
 }

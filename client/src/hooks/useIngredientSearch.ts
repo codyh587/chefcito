@@ -10,13 +10,6 @@ export function useIngredientSearch(resultLimit: number = 10) {
   const [ingredientData, setIngredientData] = useState<IngredientData>({});
   const [query, setQuery] = useState<string>("");
 
-  useEffect(() => {
-    fetch("/ingredients.json")
-      .then((res) => res.json())
-      .then((data) => setIngredientData(data))
-      .catch((err) => console.error("Failed to load ingredients:", err));
-  }, []);
-
   const fuse = useMemo(
     () => new Fuse(Object.keys(ingredientData), { threshold: 0.3 }),
     [ingredientData],
@@ -33,6 +26,13 @@ export function useIngredientSearch(resultLimit: number = 10) {
         .slice(0, resultLimit),
     [query, fuse, resultLimit, ingredientData],
   );
+
+  useEffect(() => {
+    fetch("/ingredients.json")
+      .then((res) => res.json())
+      .then((data) => setIngredientData(data))
+      .catch((err) => console.error("Failed to load ingredients:", err));
+  }, []);
 
   return { query, setQuery, results };
 }

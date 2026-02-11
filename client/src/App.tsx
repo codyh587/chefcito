@@ -8,10 +8,10 @@ export function App() {
   const { preferences } = useFoodPreferences();
 
   return (
-    <div className="overflow-x-clip">
+    <div className="scrollbar-hide overflow-x-hidden select-none">
       <AnimatePresence initial={false} mode="popLayout">
         <motion.div
-          key={preferences.surveyFinished ? "Dashboard" : "Survey"}
+          key={preferences.surveyFinished ? "dashboard" : "survey"}
           initial={{ x: 300 }}
           animate={{ x: 0 }}
           exit={{ x: -300 }}

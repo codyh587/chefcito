@@ -17,19 +17,19 @@ export function Recipes() {
   const { recipes, getRecipes, clearRecipes } = useRecipes();
 
   return (
-    <div className="flex flex-1 flex-col p-5">
+    <div className="flex flex-1 flex-col p-5 pb-0">
       {/* header */}
-      <div className="flex items-center border-b pb-3">
-        <div className="text-3xl font-medium">Recipes</div>
-        <Button onClick={() => getRecipes()} className="mt-0.5 mr-0.5 ml-auto">
+      <div className="bg-chefcito -m-5 flex items-center p-5 text-white">
+        <div className="px-0.5 text-3xl font-black tracking-wide">Recipes</div>
+        <Button onClick={() => getRecipes()} className="mr-0.5 ml-auto">
           Request
         </Button>
-        <Button onClick={clearRecipes} className="mt-0.5 mr-0.5">
+        <Button onClick={clearRecipes} className="mr-0.5">
           Reset
         </Button>
       </div>
       {/* recipes */}
-      <div className="flex-1 basis-0 space-y-3 overflow-y-auto">
+      <div className="mt-5 flex-1 basis-0 space-y-3 overflow-x-hidden overflow-y-auto pt-5">
         <AnimatePresence>
           {recipes.map((recipe, index) => (
             <Dialog key={recipe.recipe_title}>
@@ -58,7 +58,6 @@ export function Recipes() {
                       }}
                       className="text-muted-foreground ml-auto shrink-0 stroke-[1.5]"
                     />
-                    {/* recipe popup (mirrors small card) */}
                     <ChevronRight
                       size="1.75rem"
                       className="text-muted-foreground -mr-1 ml-1.5 shrink-0 stroke-[1.5]"
@@ -94,7 +93,7 @@ export function Recipes() {
                 </motion.div>
               </DialogTrigger>
               {/* recipe popup content */}
-              <DialogContent className="max-h-11/12 overflow-y-scroll rounded-3xl border-4 border-yellow-500">
+              <DialogContent className="scrollbar-hide max-h-10/12 overflow-y-auto rounded-3xl border-4 border-yellow-500 select-none">
                 {/* title */}
                 <DialogTitle className="-ml-1.5 flex items-center gap-x-1">
                   <div className="-translate-y-0.5 text-3xl">🍜</div>
