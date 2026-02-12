@@ -63,7 +63,7 @@ export function Pantry() {
                 {results.map((item) => (
                   <button
                     key={item.name}
-                    onClick={() => !hasIngredient(item) && addIngredient(item)}
+                    onClick={() => addIngredient(item)}
                     className="flex w-full items-center gap-x-2 border-b p-3 transition-colors duration-300 outline-none active:bg-yellow-50"
                   >
                     <div className="-translate-y-0.5 text-3xl">

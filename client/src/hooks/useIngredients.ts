@@ -37,7 +37,11 @@ export function useIngredients() {
   }
 
   function addIngredient(newIngredient: Ingredient) {
-    setIngredients((prev) => [...prev, newIngredient]);
+    setIngredients((prev) =>
+      prev.some((item) => item.name === newIngredient.name)
+        ? prev
+        : [...prev, newIngredient],
+    );
   }
 
   function removeIngredient(ingredientToRemove: Ingredient) {
