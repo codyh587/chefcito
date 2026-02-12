@@ -22,17 +22,23 @@ export function Pantry() {
     <div className="flex flex-1 flex-col p-5 pb-0">
       {/* header */}
       <div className="bg-chefcito -m-5 mb-5 flex items-center p-5 text-white">
-        <div className="px-0.5 text-3xl font-black tracking-wide">Pantry</div>
-        <Eraser
+        <div className="px-0.5 text-3xl font-extrabold tracking-wide">
+          Pantry
+        </div>
+        <motion.button
           onClick={clearIngredients}
-          size="2rem"
+          whileTap={{ scale: 0.9 }}
           className="mt-0.5 ml-auto text-shadow-lg"
-        />
-        <Settings
+        >
+          <Eraser size="2rem" />
+        </motion.button>
+        <motion.button
           onClick={clearPreferences}
-          size="2rem"
+          whileTap={{ scale: 0.9 }}
           className="mt-1 ml-7 text-shadow-lg"
-        />
+        >
+          <Settings size="2rem" />
+        </motion.button>
       </div>
       {/* search box */}
       <div className="relative z-10 -mb-5">
@@ -42,7 +48,7 @@ export function Pantry() {
           onChange={(e) => setQuery(e.target.value)}
           onBlur={() => setQuery("")}
           placeholder="Search ingredients..."
-          className="text-muted-foreground bg-background w-full rounded-3xl border-4 border-yellow-400 py-3 pr-4 pl-12 text-lg font-medium transition-colors duration-500 focus:border-orange-400"
+          className="text-muted-foreground bg-background w-full rounded-3xl border-4 border-yellow-400 py-3 pr-4 pl-12 text-lg font-medium transition-colors duration-500 outline-none focus:border-orange-400"
         />
         {/* search results */}
         <AnimatePresence>
@@ -87,7 +93,7 @@ export function Pantry() {
             className="m-auto mb-3 h-28 rounded-full drop-shadow-lg"
           />
           <div className="mb-1 text-2xl font-medium">No ingredients yet.</div>
-          <div className="text-muted-foreground text-lg font-medium">
+          <div className="text-muted-foreground text-lg">
             Add ingredients to start cooking!
           </div>
         </div>

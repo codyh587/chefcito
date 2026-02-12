@@ -6,6 +6,7 @@ import { useIngredients } from "@/hooks/useIngredients";
 const LOCAL_STORAGE_KEY = "chefcito_recipes";
 
 export type Recipe = {
+  recipe_id: number;
   recipe_title: string;
   category: string;
   subcategory: string;
@@ -20,6 +21,7 @@ export function useRecipes() {
   const { preferences } = useFoodPreferences();
   const { ingredientsString } = useIngredients();
 
+  const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
     try {
       const storedRecipes = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -42,6 +44,7 @@ export function useRecipes() {
 
   async function getRecipes(resultLimit: number = 10) {
     try {
+      setLoading(true);
       const response = await fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -52,8 +55,8 @@ export function useRecipes() {
           max_num_ingredients: 100,
           max_cook_time: 100,
           spice: 1,
-          protein_filled: true,
-          loose: true,
+          protein_filled: preferences.surveyFinished || false,
+          loose: false,
           limit: resultLimit,
         }),
       });
@@ -64,6 +67,8 @@ export function useRecipes() {
       console.error("Failed to fetch recipes:", error);
       setRecipes([]);
     }
+
+    setLoading(false);
   }
 
   function clearRecipes() {
@@ -71,6 +76,7 @@ export function useRecipes() {
   }
 
   return {
+    loading,
     recipes,
     getRecipes,
     clearRecipes,

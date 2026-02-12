@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Bookmark, ChefHat, ShoppingBasket } from "lucide-react";
+import { motion } from "motion/react";
 
 import { Pantry } from "@/components/Pantry";
 import { Recipes } from "@/components/Recipes";
@@ -23,33 +24,36 @@ export function Dashboard() {
       ) : null}
       {/* navbar */}
       <div className="flex h-fit outline">
-        <button
+        <motion.button
           onClick={() => setPage("pantry")}
+          whileTap={{ scale: 0.9 }}
           className="text-muted-foreground m-auto block flex-1 py-3 text-center font-medium"
         >
           <ShoppingBasket className="m-auto" size="2rem" />
           Pantry
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           onClick={() => setPage("recipes")}
           className="text-muted-foreground m-auto block flex-1 py-3 text-center font-medium"
         >
           <ChefHat className="m-auto" size="2rem" />
-          {/* Recipes */}
-          <img
-            onClick={() => setPage("recipes")}
+          Recipes
+          <motion.img
             src="/logo.svg"
+            onClick={() => setPage("recipes")}
+            whileTap={{ scale: 0.9 }}
             draggable={false}
             className="absolute bottom-4 left-1/2 h-24 -translate-x-1/2 rounded-full outline"
           />
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           onClick={() => setPage("saved")}
+          whileTap={{ scale: 0.9 }}
           className="text-muted-foreground m-auto block flex-1 py-3 text-center font-medium"
         >
           <Bookmark className="m-auto" size="2rem" />
           Saved
-        </button>
+        </motion.button>
       </div>
     </div>
   );
