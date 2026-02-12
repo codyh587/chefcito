@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const LOCAL_STORAGE_KEY = "chefcito_ingredients";
 
@@ -20,9 +20,7 @@ export function useIngredients() {
     return [];
   });
 
-  const ingredientsString = useMemo(() => {
-    return ingredients.map((item) => item.name);
-  }, [ingredients]);
+  const ingredientsString = ingredients.map((item) => item.name);
 
   useEffect(() => {
     try {

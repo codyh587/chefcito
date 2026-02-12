@@ -8,9 +8,22 @@ import { Recipes } from "@/components/Recipes";
 import { Saved } from "@/components/Saved";
 
 type Page = "pantry" | "recipes" | "saved";
+type ButtonState = "idle" | "ready" | "loading";
 
 export function Dashboard() {
   const [page, setPage] = useState<Page>("pantry");
+  const [buttonState, setButtonState] = useState<ButtonState>("idle");
+
+  function onIngredientChange() {
+    setButtonState("ready");
+  }
+  function onRecipeStart() {
+    setButtonState("loading");
+  }
+
+  function onRecipeEnd() {
+    setButtonState("idle");
+  }
 
   return (
     <div className="bg-background relative flex h-full min-h-screen w-full flex-col">

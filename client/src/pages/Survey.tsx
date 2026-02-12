@@ -132,7 +132,7 @@ export function Survey() {
             ¡BIENVENIDO A CHEFCITO!
           </motion.div>
           {/* progress bar */}
-          <div className="h-3.5 overflow-hidden rounded-full border-2 border-white bg-white/30 mb-1">
+          <div className="mb-1 h-3.5 overflow-hidden rounded-full border-2 border-white bg-white/30">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}

@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { Bookmark, ChefHat, ChevronRight, Clock, Tag } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
