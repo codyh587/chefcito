@@ -17,8 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRecipes } from "@/hooks/useRecipes";
 
 export function Recipes() {
-  const { recipes, getRecipes, clearRecipes } = useRecipes();
-  const [loading, setLoading] = useState(false);
+  const { loading, recipes, getRecipes } = useRecipes();
 
   return (
     <div className="flex flex-1 flex-col p-5 pb-0">
@@ -30,43 +29,49 @@ export function Recipes() {
         <Button onClick={() => getRecipes()} className="mr-0.5 ml-auto">
           Request
         </Button>
-        <Button onClick={() => setLoading(!loading)} className="mr-0.5">
-          Reset
-        </Button>
       </div>
       {/* recipes */}
-      <div className="mt-5 -ml-5 flex-1 basis-0 space-y-3 overflow-y-auto pt-5 pl-5">
+      <div
+        className={`mt-5 -ml-5 flex-1 basis-0 space-y-3 pt-5 pl-5 ${loading ? "overflow-y-hidden" : "overflow-y-auto"}`}
+      >
         {/* skeleton */}
         {loading ? (
-          <Skeleton className="border-accent/50 flex flex-col rounded-3xl border-4 bg-transparent px-5 py-4 pb-6">
-            <div className="mb-5 -ml-1 flex items-center gap-x-2">
-              <Skeleton className="h-9 w-9 rounded-full" />
-              <Skeleton className="h-5 w-52 rounded-full" />
-              <Skeleton className="ml-auto h-5 w-14 rounded-full" />
-            </div>
-            <Skeleton className="mb-6 -ml-0.5 h-5 w-16 rounded-full"></Skeleton>
-            <Skeleton className="mb-6 -ml-0.5 h-5 w-64 rounded-full" />
-            <Skeleton className="mb-0.5 -ml-0.5 h-5 w-full rounded-full" />
-          </Skeleton>
+          <>
+            {[1, 2, 3].map((item) => (
+              <Skeleton
+                key={item}
+                className="border-accent/50 flex flex-col rounded-3xl border-4 bg-transparent px-5 py-4 pb-6"
+              >
+                <div className="mb-5 -ml-1 flex items-center gap-x-2">
+                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <Skeleton className="h-5 w-52 rounded-full" />
+                  <Skeleton className="ml-auto h-5 w-14 rounded-full" />
+                </div>
+                <Skeleton className="mb-6 -ml-0.5 h-5 w-14 rounded-full"></Skeleton>
+                <Skeleton className="mb-6 -ml-0.5 h-5 w-52 rounded-full" />
+                <Skeleton className="mb-0.5 -ml-0.5 h-5 w-full rounded-full" />
+              </Skeleton>
+            ))}
+          </>
         ) : (
           <AnimatePresence>
+            {/* list view recipe card */}
             {recipes.map((recipe, index) => (
               <Dialog key={recipe.recipe_id}>
-                {/* list view recipe card */}
                 <DialogTrigger asChild>
                   <motion.div
                     whileTap={{ scale: 0.95 }}
-                    // initial={{ x: -100, opacity: 0 }}
-                    // animate={{
-                    //   x: 0,
-                    //   opacity: 1,
-                    //   transition: {
-                    //     delay: index * 0.1,
-                    //     type: "spring",
-                    //     stiffness: 300,
-                    //     damping: 30,
-                    //   },
-                    // }}
+                    initial={{ x: -100, opacity: 0 }}
+                    animate={{
+                      x: 0,
+                      opacity: 1,
+                      transition: {
+                        delay: index * 0.1,
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                      },
+                    }}
                     className="flex flex-col rounded-3xl border-4 border-yellow-400 px-5 pt-4 pb-4.5"
                   >
                     {/* title */}

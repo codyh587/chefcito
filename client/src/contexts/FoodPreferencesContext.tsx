@@ -69,11 +69,6 @@ export function FoodPreferencesProvider({ children }: PropsWithChildren) {
 
   function clearPreferences() {
     setPreferences({ surveyFinished: false });
-    try {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-    } catch (error) {
-      console.error("Error clearing preferences from cache:", error);
-    }
   }
 
   return (

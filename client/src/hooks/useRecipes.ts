@@ -44,7 +44,9 @@ export function useRecipes() {
 
   async function getRecipes(resultLimit: number = 10) {
     try {
+      setRecipes([]);
       setLoading(true);
+
       const response = await fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -71,14 +73,9 @@ export function useRecipes() {
     setLoading(false);
   }
 
-  function clearRecipes() {
-    setRecipes([]);
-  }
-
   return {
     loading,
     recipes,
     getRecipes,
-    clearRecipes,
   };
 }
