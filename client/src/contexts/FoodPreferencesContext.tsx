@@ -15,6 +15,7 @@ export type FoodPreferences = {
   cuisine: string;
   sweetOrSavory: string;
   surveyFinished: boolean;
+  buttonReady: boolean;
 };
 
 type FoodPreferencesContextType = {

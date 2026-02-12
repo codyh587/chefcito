@@ -10,20 +10,13 @@ import { Saved } from "@/components/Saved";
 type Page = "pantry" | "recipes" | "saved";
 type ButtonState = "idle" | "ready" | "loading";
 
+// todo:
+// button state: idle -> ready (after ingredient change) -> loading (after request) -> idle (after recipes load)
+// recipe persistence between page changes (might have to lift everything regardless)
+
 export function Dashboard() {
   const [page, setPage] = useState<Page>("pantry");
   const [buttonState, setButtonState] = useState<ButtonState>("idle");
-
-  function onIngredientChange() {
-    setButtonState("ready");
-  }
-  function onRecipeStart() {
-    setButtonState("loading");
-  }
-
-  function onRecipeEnd() {
-    setButtonState("idle");
-  }
 
   return (
     <div className="bg-background relative flex h-full min-h-screen w-full flex-col">
