@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Bookmark, ChefHat, ShoppingBasket } from "lucide-react";
+import { Bookmark, ShoppingBasket } from "lucide-react";
 import { motion } from "motion/react";
 
 import { Pantry } from "@/components/Pantry";
@@ -19,43 +19,38 @@ export function Dashboard() {
   const [buttonState, setButtonState] = useState<ButtonState>("idle");
 
   return (
-    <div className="bg-background relative flex h-full min-h-screen w-full flex-col">
+    <div className="bg-background relative flex min-h-screen flex-col">
       {/* main page view */}
       {page === "pantry" ? (
         <Pantry />
       ) : page === "recipes" ? (
         <Recipes />
-      ) : page === "saved" ? (
+      ) : (
         <Saved />
-      ) : null}
+      )}
       {/* navbar */}
-      <div className="flex h-fit outline">
+      <div className="text-muted-foreground flex text-center font-medium outline">
         <motion.button
           onClick={() => setPage("pantry")}
           whileTap={{ scale: 0.9 }}
-          className="text-muted-foreground m-auto block flex-1 py-3 text-center font-medium"
+          className="m-auto flex-1 py-3"
         >
           <ShoppingBasket className="m-auto" size="2rem" />
           Pantry
         </motion.button>
-        <motion.button
-          onClick={() => setPage("recipes")}
-          className="text-muted-foreground m-auto block flex-1 py-3 text-center font-medium"
-        >
-          <ChefHat className="m-auto" size="2rem" />
-          Recipes
+        <div className="flex-1">
           <motion.img
-            src="/logo.svg"
             onClick={() => setPage("recipes")}
             whileTap={{ scale: 0.9 }}
+            src="/logo.svg"
             draggable={false}
             className="absolute bottom-4 left-1/2 h-24 -translate-x-1/2 rounded-full outline"
           />
-        </motion.button>
+        </div>
         <motion.button
           onClick={() => setPage("saved")}
           whileTap={{ scale: 0.9 }}
-          className="text-muted-foreground m-auto block flex-1 py-3 text-center font-medium"
+          className="m-auto flex-1 py-3"
         >
           <Bookmark className="m-auto" size="2rem" />
           Saved

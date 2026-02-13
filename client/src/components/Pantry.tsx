@@ -28,21 +28,21 @@ export function Pantry() {
         <motion.button
           onClick={clearIngredients}
           whileTap={{ scale: 0.9 }}
-          className="mt-0.5 ml-auto text-shadow-lg"
+          className="mt-0.5 ml-auto"
         >
           <Eraser size="2rem" />
         </motion.button>
         <motion.button
           onClick={clearPreferences}
           whileTap={{ scale: 0.9 }}
-          className="mt-1 ml-7 text-shadow-lg"
+          className="mt-1 ml-7"
         >
           <Settings size="2rem" />
         </motion.button>
       </div>
       {/* search box */}
       <div className="relative z-10 -mb-5">
-        <Search className="text-muted-foreground absolute top-1/2 left-4 h-6 -translate-y-1/2 transform" />
+        <Search className="text-muted-foreground absolute top-1/2 left-4 h-6 -translate-y-1/2" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -57,35 +57,32 @@ export function Pantry() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full right-0 left-0 z-10 mt-2.5 overflow-hidden rounded-3xl border-4 border-yellow-400 bg-white shadow-2xl"
+              className="absolute z-10 mt-2.5 flex max-h-62 w-full flex-col overflow-y-scroll rounded-3xl border-4 border-yellow-400 bg-white shadow-2xl"
             >
-              <div className="max-h-60 overflow-y-auto">
-                {results.map((item) => (
-                  <button
-                    key={item.name}
-                    onClick={() => addIngredient(item)}
-                    className="flex w-full items-center gap-x-2 border-b p-3 transition-colors duration-300 outline-none active:bg-yellow-50"
-                  >
-                    <div className="-translate-y-0.5 text-3xl">
-                      {item.emoji}
-                    </div>
-                    <div className="flex-1 text-left text-lg font-medium">
-                      {toProperCase(item.name)}
-                    </div>
-                    {hasIngredient(item) ? (
-                      <Check className="h-5 text-green-500" />
-                    ) : (
-                      <Plus className="text-muted-foreground h-5" />
-                    )}
-                  </button>
-                ))}
-              </div>
+              {results.map((item) => (
+                <button
+                  key={item.name}
+                  onClick={() => addIngredient(item)}
+                  className="flex items-center gap-x-2 border-b p-3 transition-colors duration-300 active:bg-yellow-50"
+                >
+                  <div className="-translate-y-0.5 text-3xl">{item.emoji}</div>
+                  <div className="text-lg font-medium">
+                    {toProperCase(item.name)}
+                  </div>
+                  {hasIngredient(item) ? (
+                    <Check className="ml-auto h-5 text-green-500" />
+                  ) : (
+                    <Plus className="text-muted-foreground ml-auto h-5" />
+                  )}
+                </button>
+              ))}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
       {/* ingredients list */}
       {ingredients.length === 0 ? (
+        // empty state
         <div className="m-auto text-center">
           <img
             src={SearchAsset}
@@ -98,7 +95,8 @@ export function Pantry() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 basis-0 overflow-y-auto">
+        // non-empty state
+        <div className="flex flex-1 basis-0 flex-col gap-y-3 overflow-y-auto pt-8 pb-5">
           <AnimatePresence>
             {ingredients.map((item) => (
               <motion.div
@@ -107,17 +105,17 @@ export function Pantry() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 600, damping: 50 }}
-                className="mt-3 flex w-full items-center gap-x-1.5 rounded-3xl border-4 border-green-500 bg-linear-to-r from-green-50 to-green-100 p-2 first:mt-8"
+                className="flex items-center gap-x-1.5 rounded-3xl border-4 border-green-500 bg-linear-to-r from-green-50 to-green-100 p-2"
               >
                 <div className="-translate-y-0.5 text-3xl">{item.emoji}</div>
-                <div className="flex-1 truncate text-lg font-medium">
+                <div className="truncate text-lg font-medium">
                   {toProperCase(item.name)}
                 </div>
                 <button
                   onClick={() => removeIngredient(item)}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                  className="text-muted-foreground ml-auto h-7 w-7 rounded-full"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-5" />
                 </button>
               </motion.div>
             ))}

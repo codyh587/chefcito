@@ -19,7 +19,7 @@ export type Recipe = {
 
 export function useRecipes() {
   const { preferences } = useFoodPreferences();
-  const { ingredientsString } = useIngredients();
+  const { ingredientsToStringArray } = useIngredients();
 
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
@@ -55,7 +55,7 @@ export function useRecipes() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ingredients: ingredientsString,
+          ingredients: ingredientsToStringArray,
           allergens: [],
           pastry: false,
           max_num_ingredients: 100,

@@ -85,7 +85,6 @@ export function Survey() {
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState("");
-  const [answers, setAnswers] = useState<Partial<FoodPreferences>>({});
 
   const question = questions[currentQuestion];
   const progress = (currentQuestion / (questions.length - 1)) * 100;
@@ -94,33 +93,30 @@ export function Survey() {
     setSelectedOption(value);
 
     setTimeout(() => {
-      const newAnswers = { ...answers, [question.id]: value };
+      updatePreferences({ [question.id]: value });
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
         setSelectedOption("");
-        setAnswers(newAnswers);
-      } else {
-        updatePreferences({ ...newAnswers, surveyFinished: true });
       }
     }, 500);
   }
 
   return (
-    <div className="bg-chefcito relative h-full min-h-screen w-full p-10">
+    <div className="bg-chefcito relative min-h-screen p-10">
       <AnimatePresence>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col gap-y-5 overflow-x-hidden overflow-y-auto text-center"
+          className="-mr-10 flex flex-col gap-y-5 pr-10 text-center"
         >
           {/* logo */}
           <motion.img
             animate={{ rotate: [10, -10, 10] }}
             transition={{ duration: 4, repeat: Infinity }}
-            className="m-auto h-20 w-20 rounded-full shadow-lg"
             src="/logo.svg"
             draggable={false}
+            className="m-auto h-20 rounded-full shadow-lg"
           />
           {/* header */}
           <motion.div
@@ -148,11 +144,11 @@ export function Survey() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -300, opacity: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 25 }}
-              className="rounded-3xl border-4 border-yellow-300 bg-white p-5"
+              className="bg-background rounded-3xl border-4 border-yellow-300 p-5"
             >
               {/* question header */}
               <div className="text-5xl">{question.emoji}</div>
-              <div className="mt-2.5 mb-6 text-xl font-bold text-gray-800">
+              <div className="mt-2.5 mb-6 text-xl font-bold">
                 {question.question}
               </div>
               <div className="flex flex-col gap-y-3">
@@ -162,24 +158,26 @@ export function Survey() {
                     key={option.value}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleSelect(option.value)}
-                    className={`relative flex min-h-15 items-center gap-3 overflow-hidden rounded-2xl border-4 p-4 text-left text-base font-bold transition-all duration-300 ${
+                    className={`flex items-center gap-x-3 rounded-2xl border-4 p-4 text-left font-bold transition-all duration-300 ${
                       selectedOption === option.value
                         ? "border-green-500 bg-green-100 text-green-800"
                         : "border-gray-300 bg-linear-to-r from-yellow-50 to-red-50 text-gray-800 active:border-yellow-300"
                     }`}
                   >
-                    <div className="shrink-0 text-3xl">{option.emoji}</div>
-                    <div className="flex-1 text-lg">{option.label}</div>
-                    {selectedOption === option.value && (
+                    <div className="text-3xl">{option.emoji}</div>
+                    <div className="text-lg">{option.label}</div>
+                    {selectedOption === option.value ? (
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1, rotate: 360 }}
                         transition={{ type: "spring", stiffness: 100 }}
+                        className="ml-auto"
                       >
-                        <Sparkles className="h-6 w-6 text-green-600" />
+                        <Sparkles className="h-6 text-green-600" />
                       </motion.div>
+                    ) : (
+                      <ChevronRight className="ml-auto h-5 opacity-50" />
                     )}
-                    <ChevronRight className="h-5 w-5 shrink-0 opacity-50" />
                   </motion.button>
                 ))}
               </div>

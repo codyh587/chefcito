@@ -20,7 +20,7 @@ export function useIngredients() {
     return [];
   });
 
-  const ingredientsString = ingredients.map((item) => item.name);
+  const ingredientsToStringArray = ingredients.map((item) => item.name);
 
   useEffect(() => {
     try {
@@ -54,7 +54,7 @@ export function useIngredients() {
 
   return {
     ingredients,
-    ingredientsString,
+    ingredientsToStringArray,
     hasIngredient,
     addIngredient,
     removeIngredient,
