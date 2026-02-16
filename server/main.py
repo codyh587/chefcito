@@ -28,6 +28,7 @@ with open("clean_recipes.jsonl", encoding="utf-8") as fin:
 METAS = [extract_metadata(r) for r in recipes]
 IDF = build_idf(METAS)
 
+
 class RecommendBody(BaseModel):
     ingredients: set[str]
     allergens: set[str]
@@ -39,16 +40,20 @@ class RecommendBody(BaseModel):
     loose: bool
     limit: int
 
+
 @app.post("/recommend")
 def post_recommend(body: RecommendBody):
-    return {
-        "data": recommend(
-            recipes=recipes,
-            metas=METAS,
-            idf=IDF,
-            intent=body.model_dump(),
-            liked=[],
-            disliked=[],
-            k=body.limit,
-        )
-    }
+    results = recommend(
+        recipes=recipes,
+        metas=METAS,
+        idf=IDF,
+        intent=body.model_dump(),
+        liked=[],
+        disliked=[],
+        k=body.limit,
+    )
+
+
+    clean_data = [item[1] for item in results]
+
+    return {"data": clean_data}
