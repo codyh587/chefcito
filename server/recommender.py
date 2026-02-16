@@ -1,9 +1,31 @@
 import json
 import math
+import re
 from collections import Counter
-import torch
-import torch.nn as nn
 import numpy as np
+
+# =========================
+# NORMALIZATION
+# =========================
+
+UNITS = {"lb", "lbs", "pound", "cup", "cups",
+         "tsp", "tbsp", "oz", "ounce", "ounces"}
+
+
+def normalize_ing(ing):
+    ing = ing.lower()
+    ing = re.sub(r"[^\w\s]", "", ing)
+    tokens = ing.split()
+    tokens = [t for t in tokens if t not in UNITS and not t.isdigit()]
+    return " ".join(tokens)
+
+
+def tokenize_ing(ing):
+    return set(normalize_ing(ing).split())
+
+# =========================
+# KNOWLEDGE
+# =========================
 
 
 ALLERGEN_MAP = {
@@ -46,269 +68,207 @@ SPICY_INGREDIENTS = {
     "curry paste": 0.5
 }
 
+# =========================
+# FEATURE EXTRACTION
+# =========================
 
-def extract_proteins(ingredients):
+
+def extract_proteins(norm_ingredients):
     found = set()
+    joined = " ".join(norm_ingredients)
     for canon, variants in PROTEIN_CANONICAL.items():
-        if ingredients & variants:
-            found.add(canon)
+        for v in variants:
+            if v in joined:
+                found.add(canon)
     return found
 
 
-def contains_allergen(ingredients, blocked):
-    for allergen in blocked:
-        if ingredients & ALLERGEN_MAP.get(allergen, set()):
-            return True
-    return False
-
-
-def infer_spice(ingredients):
+def infer_spice(norm_ingredients):
     score = 0.0
-    for ing in ingredients:
-        for spicy, weight in SPICY_INGREDIENTS.items():
+    for ing in norm_ingredients:
+        for spicy, w in SPICY_INGREDIENTS.items():
             if spicy in ing:
-                score += weight
+                score += w
     return min(score, 1.0)
 
 
 def extract_metadata(recipe):
-    ing = {i.lower() for i in recipe["ingredients"]}
-    proteins = extract_proteins(ing)
-    spice = infer_spice(ing)
+    norm = [normalize_ing(i) for i in recipe["ingredients"]]
+    tokens = set()
+    for i in norm:
+        tokens |= tokenize_ing(i)
+
+    proteins = extract_proteins(norm)
 
     return {
-        # usefull if we want to make veggiterian
-        "protein_filled": bool(proteins),
+        "ingredients": set(norm),
+        "tokens": tokens,
         "proteins": proteins,
-        "num_ingredients": len(ing),
-        # assuming each step takes ~ 3 minutes
+        "protein_filled": bool(proteins),
+        "num_ingredients": len(norm),
         "cook_time": recipe.get("num_steps", 10) * 3,
-        "spice": spice,
-        "pastry": recipe.get("subcategory", "") == "Allrecipes Allstars Desserts",
-        "ingredients": ing
+        "spice": infer_spice(norm),
+        "pastry": recipe.get("subcategory", "").lower().startswith("dessert")
     }
 
-
-def passes_filters(meta, intent):
-    if intent["pastry"] is not None and meta["pastry"] != intent["pastry"]:
-        return False
-    if intent["protein_filled"] and not meta["protein_filled"]:
-        return False
-    if meta["num_ingredients"] > intent["max_num_ingredients"]:
-        return False
-    if meta["cook_time"] > intent["max_cook_time"]:
-        return False
-    if contains_allergen(meta["ingredients"], intent["allergens"]):
-        return False
-
-    if not intent["loose"]:
-        if not intent["ingredients"].issubset(meta["ingredients"]):
-            return False
-    else:
-        if len(intent["ingredients"] & meta["ingredients"]) == 0:
-            return False
-
-    return True
+# =========================
+# VECTOR SPACE
+# =========================
 
 
-def build_legal_recipe_universe(recipes, intent):
-    user_proteins = extract_proteins(intent["ingredients"])
-    legal = []
-
-    for r in recipes:
-        meta = extract_metadata(r)
-        if not passes_filters(meta, intent):
-            continue
-
-        if user_proteins:
-            if meta["proteins"] != user_proteins:
-                continue
-
-        legal.append(r)
-
-    return legal
-
-
-def build_ingredient_weights(recipes):
+def build_idf(metas):
     counter = Counter()
-    for r in recipes:
-        counter.update(extract_metadata(r)["ingredients"])
+    for m in metas:
+        counter.update(m["tokens"])
     total = sum(counter.values())
     return {k: math.log(total / v) for k, v in counter.items()}
 
 
-def build_user_profile(recipes):
-    profile = Counter()
-    for r in recipes:
-        profile.update(extract_metadata(r)["ingredients"])
-    return profile
+def cosine_similarity(a, b):
+    dot = sum(a.get(i, 0) * b.get(i, 0) for i in b)
+    norm_a = math.sqrt(sum(v*v for v in a.values()))
+    norm_b = math.sqrt(sum(v*v for v in b.values()))
+    return dot / max(norm_a * norm_b, 1e-6)
+
+# =========================
+# FILTERING
+# =========================
 
 
-def similarity(meta, profile):
-    score = 0.0
-    for ing in meta["ingredients"]:
-        score += profile.get(ing, 0)
-    return score / max(sum(profile.values()), 1)
+def ingredient_match(user_ings, recipe_ings):
+    for u in user_ings:
+        for r in recipe_ings:
+            if u in r or r in u:
+                return True
+    return False
+
+# =========================
+# LINEAR RANKER
+# =========================
 
 
-def recipe_features(meta, intent, weights, user_profile, disliked_profile, avg_spice):
-    overlap = len(meta["ingredients"] & intent["ingredients"]
-                  ) / max(len(intent["ingredients"]), 1)
-    weighted_overlap = sum(weights.get(i, 0.0)
-                           for i in meta["ingredients"] & intent["ingredients"])
-    spice_dist = abs(meta["spice"] - intent["spice"])
-    user_sim = similarity(meta, user_profile)
-    dislike_sim = similarity(meta, disliked_profile)
-    novelty = len(meta["ingredients"] - user_profile.keys()
-                  ) / max(len(meta["ingredients"]), 1)
-    protein_score = len(meta["proteins"] &
-                        extract_proteins(intent["ingredients"]))
-    spice_user_dist = abs(meta["spice"] - avg_spice)
-
-    return torch.tensor([
-        overlap,                       # 1
-        weighted_overlap,              # 2
-        1 - spice_dist,                # 3
-        protein_score,                 # 4
-        meta["cook_time"],             # 5 (time in minutes)
-        meta["num_ingredients"] / 20,  # 6
-        user_sim,                      # 7
-        1 - dislike_sim,               # 8
-        novelty,                       # 9
-        1 - spice_user_dist,           # 10
-        float(meta["pastry"]),         # 11
-        len(meta["proteins"])          # 12
-    ], dtype=torch.float32)
-
-# -------------------------------
-# RANKER
-# -------------------------------
+WEIGHTS = np.array([
+    2.0,  # overlap
+    1.5,  # tf-idf
+    1.0,  # spice
+    1.0,  # protein
+    0.8,  # cook time
+    0.5,  # simplicity
+    1.2,  # user similarity
+    1.0,  # dislike distance
+    0.6,  # novelty
+    1.0   # spice tolerance
+])
 
 
-class Ranker(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(12, 32),
-            nn.ReLU(),
-            nn.Linear(32, 1),
-            nn.Sigmoid()
-        )
+def recommend(recipes, metas, idf, intent, liked, disliked, k=10):
+    user_norm = {normalize_ing(i) for i in intent["ingredients"]}
+    user_tokens = set()
+    for i in user_norm:
+        user_tokens |= tokenize_ing(i)
+    user_proteins = extract_proteins(user_norm)
 
-    def forward(self, x):
-        return self.net(x).squeeze(-1)
-
-# -------------------------------
-# TRAINING
-# -------------------------------
-
-
-def train_ranker(ranker, liked, disliked, intent, epochs=50, lr=0.01):
-    weights = build_ingredient_weights(RECIPES)
-    user_profile = build_user_profile(liked)
-    disliked_profile = build_user_profile(disliked)
-    avg_spice = np.mean([extract_metadata(r)["spice"]
-                        for r in liked]) if liked else 0.3
-
-    optimizer = torch.optim.Adam(ranker.parameters(), lr=lr)
-    criterion = nn.BCELoss()
-
-    X, y = [], []
-
+    user_prof = Counter()
     for r in liked:
-        meta = extract_metadata(r)
-        X.append(recipe_features(meta, intent, weights,
-                 user_profile, disliked_profile, avg_spice))
-        y.append(torch.tensor(1.0))
+        user_prof.update(extract_metadata(r)["tokens"])
 
+    disliked_prof = Counter()
     for r in disliked:
-        meta = extract_metadata(r)
-        X.append(recipe_features(meta, intent, weights,
-                 user_profile, disliked_profile, avg_spice))
-        y.append(torch.tensor(0.0))
+        disliked_prof.update(extract_metadata(r)["tokens"])
 
-    if not X:
-        return
+    avg_spice = np.mean([m["spice"] for m in metas]) if liked else 0.3
 
-    X = torch.stack(X)
-    y = torch.stack(y)
-
-    for _ in range(epochs):
-        optimizer.zero_grad()
-        loss = criterion(ranker(X), y)
-        loss.backward()
-        optimizer.step()
-
-# -------------------------------
-# RECOMMENDER
-# -------------------------------
-
-
-def recommend(recipes, intent, ranker, liked, disliked=None, k=10):
-    disliked = disliked or []
-    metas = [extract_metadata(r) for r in recipes]
-    weights = build_ingredient_weights(recipes)
-    user_profile = build_user_profile(liked)
-    disliked_profile = build_user_profile(disliked)
-    avg_spice = np.mean([extract_metadata(r)["spice"]
-                        for r in liked]) if liked else 0.3
-
-    scores = []
+    scored = []
 
     for r, meta in zip(recipes, metas):
-        feats = recipe_features(meta, intent, weights,
-                                user_profile, disliked_profile, avg_spice)
-        with torch.no_grad():
-            ml_score = ranker(feats.unsqueeze(0)).item()
-        scores.append((r, ml_score))
+        if intent["pastry"] is not None and meta["pastry"] != intent["pastry"]:
+            continue
+        if intent["protein_filled"] and not meta["protein_filled"]:
+            continue
+        if meta["num_ingredients"] > intent["max_num_ingredients"]:
+            continue
+        if meta["cook_time"] > intent["max_cook_time"]:
+            continue
+        if user_proteins and not user_proteins.issubset(meta["proteins"]):
+            continue
 
-    scores.sort(key=lambda x: x[1], reverse=True)
-    return [r for r, _ in scores[:k]]
+        if intent["loose"]:
+            if not ingredient_match(user_norm, meta["ingredients"]):
+                continue
+        else:
+            if not all(any(u in r for r in meta["ingredients"]) for u in user_norm):
+                continue
+
+        overlap = len(meta["tokens"] & user_tokens) / max(len(user_tokens), 1)
+        weighted_overlap = sum(idf.get(i, 0)
+                               for i in meta["tokens"] & user_tokens)
+        spice_match = 1 - abs(meta["spice"] - intent["spice"])
+        cook_time = meta["cook_time"] / 120
+        complexity = meta["num_ingredients"] / 20
+        user_sim = cosine_similarity(user_prof, Counter(meta["tokens"]))
+        dislike_sim = cosine_similarity(disliked_prof, Counter(meta["tokens"]))
+        novelty = len(meta["tokens"] - user_prof.keys()) / \
+            max(len(meta["tokens"]), 1)
+        protein_match = len(meta["proteins"] & user_proteins) > 0
+        spice_user_match = 1 - abs(meta["spice"] - avg_spice)
+
+        vec = np.array([
+            overlap,
+            weighted_overlap,
+            spice_match,
+            protein_match,
+            1 - cook_time,
+            1 - complexity,
+            user_sim,
+            1 - dislike_sim,
+            novelty,
+            spice_user_match
+        ])
+
+        score = np.dot(vec, WEIGHTS)
+        scored.append((score, r))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return scored[:k]
+
+# =========================
+# USAGE
+# =========================
 
 
 if __name__ == "__main__":
-    # Recommendation factors:
-    # 1) Ingredient overlap with user intent
-    # 2) Weighted ingredient importance (TF-IDF)
-    # 3) Spice match to user preference
-    # 4) Protein match score
-    # 5) Cook time
-    # 6) Recipe complexity (num ingredients)
-    # 7) Similarity to liked recipes
-    # 8) Distance from disliked recipes
-    # 9) Novelty vs familiarity
-    # 10) Personal spice tolerance
-    # 11) Allergens (just to ensure we are right)
-
     RAW_RECIPES = []
     with open("clean_recipes.jsonl", encoding="utf-8") as f:
         for line in f:
             RAW_RECIPES.append(json.loads(line))
 
+    METAS = [extract_metadata(r) for r in RAW_RECIPES]
+    IDF = build_idf(METAS)
+
     intent = {
-        "ingredients": {"chicken", "potato", "tomato sauce", "onion", "garlic", "jalapeno"},
+        "ingredients": {"ground beef", "miso"},
         "allergens": {"nuts", "soy"},
         "pastry": False,
         "max_num_ingredients": 10,
-        "max_cook_time": 60,  # measured in minutes
+        "max_cook_time": 60,
         "spice": 0.4,
         "protein_filled": True,
         "loose": True
     }
 
-    RECIPES = build_legal_recipe_universe(RAW_RECIPES, intent)
+    liked_recipes = RAW_RECIPES[:10]
+    disliked_recipes = RAW_RECIPES[10:20]
 
-    print(f"Loaded {len(RAW_RECIPES)} recipes")
-    print(f"Legal universe: {len(RECIPES)} recipes")
-    liked_recipes = RECIPES[:5]
-    disliked_recipes = RECIPES[5:10]
+    results = recommend(
+        RAW_RECIPES,
+        METAS,
+        IDF,
+        intent,
+        liked_recipes,
+        disliked_recipes,
+        k=10
+    )
 
-    ranker = Ranker()
-    train_ranker(ranker, liked_recipes, disliked_recipes, intent)
-
-    results = recommend(RECIPES, intent, ranker,
-                        liked_recipes, disliked_recipes)
-
-    print("\nTop recommendations:")
-    for r in results:
-        print("•", r["recipe_title"])
+    print("\nTop Recommendations:\n")
+    for score, r in results:
+        print(f"{score:.3f} | {r['recipe_title']}")
