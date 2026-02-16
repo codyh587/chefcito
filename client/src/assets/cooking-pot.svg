@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="geometricPrecision">
+    <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffc83d" />
+            <stop offset="12%" stop-color="#ffc83d" />
+            <stop offset="12%" stop-color="#ffb22c" />
+            <stop offset="24%" stop-color="#ffb22c" />
+            <stop offset="24%" stop-color="#ff9a1f" />
+            <stop offset="36%" stop-color="#ff9a1f" />
+            <stop offset="36%" stop-color="#ff861c" />
+            <stop offset="48%" stop-color="#ff861c" />
+            <stop offset="48%" stop-color="#ff6d4a" />
+            <stop offset="60%" stop-color="#ff6d4a" />
+            <stop offset="60%" stop-color="#ff5a75" />
+            <stop offset="72%" stop-color="#ff5a75" />
+            <stop offset="72%" stop-color="#ff4f8b" />
+            <stop offset="84%" stop-color="#ff4f8b" />
+            <stop offset="84%" stop-color="#ff3f97" />
+            <stop offset="100%" stop-color="#ff3f97" />
+        </linearGradient>
+    </defs>
+    <circle cx="256" cy="256" r="244" fill="url(#grad)" stroke="white" stroke-width="24" />
+    <g transform="translate(256 256) scale(12) translate(-12 -12)" fill="none" stroke="white" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+        <path d="M2 12h20" />
+        <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+        <path d="m4 8 16-4" />
+        <path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8" />
+    </g>
+</svg>

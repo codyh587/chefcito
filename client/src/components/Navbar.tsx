@@ -4,11 +4,12 @@ import { Bookmark, ShoppingBasket } from "lucide-react";
 import { motion } from "motion/react";
 
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
+import type { Page } from "@/pages/Dashboard";
 
 export function Navbar({
   setPage,
 }: {
-  setPage: Dispatch<SetStateAction<string>>;
+  setPage: Dispatch<SetStateAction<Page>>;
 }) {
   const {
     preferences: { recipesReady },

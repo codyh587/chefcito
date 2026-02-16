@@ -151,8 +151,8 @@ export function Survey() {
               <div className="mt-2.5 mb-6 text-xl font-bold">
                 {question.question}
               </div>
+              {/* question options */}
               <div className="flex flex-col gap-y-3">
-                {/* question options */}
                 {question.options.map((option) => (
                   <motion.button
                     key={option.value}

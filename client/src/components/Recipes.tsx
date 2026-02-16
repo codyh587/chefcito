@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import CookingPotAsset from "@/assets/cooking-pot.svg";
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useRecipes } from "@/hooks/useRecipes";
 
@@ -30,10 +31,10 @@ export function Recipes() {
   const { loading, recipes, getRecipes } = useRecipes();
 
   useEffect(() => {
-    if (recipesReady || recipes.length === 0) {
+    if (recipesReady) {
       getRecipes();
     }
-  }, [recipesReady, getRecipes, recipes]);
+  }, [recipesReady, getRecipes]);
 
   return (
     <div className="flex flex-1 flex-col p-5 pb-0">
@@ -50,11 +51,11 @@ export function Recipes() {
           <RotateCcw size="2rem" />
         </motion.button>
       </div>
-      {/* recipes */}
+      {/* recipes list */}
       <div
         className={`mt-5 -ml-5 flex flex-1 basis-0 flex-col gap-y-3 py-5 pl-5 ${loading ? "overflow-y-hidden" : "overflow-y-auto"}`}
       >
-        {/* skeleton */}
+        {/* loading skeleton */}
         {loading ? (
           <>
             {[1, 2, 3].map((item) => (
@@ -73,11 +74,24 @@ export function Recipes() {
               </Skeleton>
             ))}
           </>
+        ) : // empty state
+        recipes.length === 0 ? (
+          <div className="m-auto text-center">
+            <img
+              src={CookingPotAsset}
+              draggable={false}
+              className="m-auto mt-14.75 mb-3 h-28 rounded-full drop-shadow-lg"
+            />
+            <div className="mb-1 text-2xl font-medium">No recipes found.</div>
+            <div className="text-muted-foreground text-lg">
+              Try other ingredients to find more recipes!
+            </div>
+          </div>
         ) : (
-          // recipe list view
+          // non empty state
           <AnimatePresence>
             {recipes.map((recipe, index) => (
-              // dialog popup header
+              // invisible dialog popup header
               <Dialog key={recipe.recipe_id}>
                 <DialogTrigger asChild>
                   <motion.div
