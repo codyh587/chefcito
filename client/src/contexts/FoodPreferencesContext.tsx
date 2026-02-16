@@ -15,6 +15,7 @@ export type FoodPreferences = {
   cuisine: string;
   sweetOrSavory: string;
   surveyFinished: boolean;
+  buttonReady: boolean;
 };
 
 type FoodPreferencesContextType = {
@@ -26,6 +27,16 @@ type FoodPreferencesContextType = {
 const FoodPreferencesContext = createContext<
   FoodPreferencesContextType | undefined
 >(undefined);
+
+export function useFoodPreferences() {
+  const context = useContext(FoodPreferencesContext);
+  if (context === undefined) {
+    throw new Error(
+      "useFoodPreferences must be used within a FoodPreferencesProvider",
+    );
+  }
+  return context;
+}
 
 export function FoodPreferencesProvider({ children }: PropsWithChildren) {
   const [preferences, setPreferences] = useState<Partial<FoodPreferences>>(
@@ -59,11 +70,6 @@ export function FoodPreferencesProvider({ children }: PropsWithChildren) {
 
   function clearPreferences() {
     setPreferences({ surveyFinished: false });
-    try {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-    } catch (error) {
-      console.error("Error clearing preferences from cache:", error);
-    }
   }
 
   return (
@@ -73,14 +79,4 @@ export function FoodPreferencesProvider({ children }: PropsWithChildren) {
       {children}
     </FoodPreferencesContext.Provider>
   );
-}
-
-export function useFoodPreferences() {
-  const context = useContext(FoodPreferencesContext);
-  if (context === undefined) {
-    throw new Error(
-      "useFoodPreferences must be used within a FoodPreferencesProvider",
-    );
-  }
-  return context;
 }

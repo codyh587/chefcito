@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const LOCAL_STORAGE_KEY = "chefcito_ingredients";
 
@@ -20,9 +20,7 @@ export function useIngredients() {
     return [];
   });
 
-  const ingredientsString = useMemo(() => {
-    return ingredients.map((item) => item.name);
-  }, [ingredients]);
+  const ingredientsToStringArray = ingredients.map((item) => item.name);
 
   useEffect(() => {
     try {
@@ -37,7 +35,11 @@ export function useIngredients() {
   }
 
   function addIngredient(newIngredient: Ingredient) {
-    setIngredients((prev) => [...prev, newIngredient]);
+    setIngredients((prev) =>
+      prev.some((item) => item.name === newIngredient.name)
+        ? prev
+        : [...prev, newIngredient],
+    );
   }
 
   function removeIngredient(ingredientToRemove: Ingredient) {
@@ -46,11 +48,16 @@ export function useIngredients() {
     );
   }
 
+  function clearIngredients() {
+    setIngredients([]);
+  }
+
   return {
     ingredients,
-    ingredientsString,
+    ingredientsToStringArray,
     hasIngredient,
     addIngredient,
     removeIngredient,
+    clearIngredients,
   };
 }

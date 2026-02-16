@@ -19,9 +19,12 @@ for item in RECIPES:
 
 print(len(names))
 print(len(noDupes))
-# with open("recipe2.jsonl", "w") as f:
-#     for entry in noDupes:
-#         print(json.dumps(entry), file=f)
+recipe_id = 0  
+with open("recipe2.jsonl", "w", encoding="utf-8") as f:
+    for entry in noDupes:
+        entry["recipe_id"] = recipe_id
+        recipe_id += 1
+        print(json.dumps(entry, ensure_ascii=False), file=f)
 
 # for simplicity sake, only ingredients
 # with open("ingredients.jsonl", "w") as f:
@@ -111,10 +114,12 @@ for entry in noParens:
 #     for entry in noUnicodes:
 #         print(json.dumps(entry), file=f)
 
-allIngredients = set()
-for entry in noUnicodes:
-    for ingredient in entry:
-        allIngredients.add(ingredient.lower())
+test = noDupes.copy()
+x = 0
+for line in test:
+    line["ingredients"] = noUnicodes[x]
+    x += 1
 
-with open("ingredients.txt", "w") as f:  # list of all unique ingredients
-    print("\n".join(allIngredients), file=f)
+with open("clean_recipes.jsonl", "w", encoding="utf-8") as f:
+    for line in test:
+        print(json.dumps(line, ensure_ascii=False), file=f)

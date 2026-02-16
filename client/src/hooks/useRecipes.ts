@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useIngredients } from "@/hooks/useIngredients";
@@ -6,6 +6,7 @@ import { useIngredients } from "@/hooks/useIngredients";
 const LOCAL_STORAGE_KEY = "chefcito_recipes";
 
 export type Recipe = {
+  recipe_id: number;
   recipe_title: string;
   category: string;
   subcategory: string;
@@ -18,7 +19,9 @@ export type Recipe = {
 
 export function useRecipes() {
   const { preferences } = useFoodPreferences();
-  const { ingredientsString } = useIngredients();
+  const { ingredientsToStringArray } = useIngredients();
+
+  const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
     try {
       const storedRecipes = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -39,41 +42,44 @@ export function useRecipes() {
     }
   }, [recipes]);
 
-  const getRecipes = useCallback(
-    async (resultLimit: number = 10) => {
-      try {
-        const response = await fetch("http://localhost:8000/recommend", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ingredients: ingredientsString,
-            allergens: [],
-            pastry: false,
-            max_num_ingredients: 100,
-            max_cook_time: 100,
-            spice: 1,
-            protein_filled: true,
-            loose: true,
-            limit: resultLimit,
-          }),
-        });
-        const body = await response.json();
-        setRecipes(body.data || []);
-      } catch (error) {
-        console.error("Failed to fetch recipes:", error);
-        setRecipes([]);
-      }
-    },
-    [ingredientsString, preferences],
-  );
+  async function getRecipes(resultLimit: number = 10) {
+    if (loading) {
+      return;
+    }
 
-  function clearRecipes() {
     setRecipes([]);
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ingredients: ingredientsToStringArray,
+          allergens: [],
+          pastry: false,
+          max_num_ingredients: 100,
+          max_cook_time: 100,
+          spice: 1,
+          protein_filled: preferences.surveyFinished || false,
+          loose: false,
+          limit: resultLimit,
+        }),
+      });
+
+      const body = await response.json();
+      setRecipes(body.data || []);
+    } catch (error) {
+      console.error("Failed to fetch recipes:", error);
+      setRecipes([]);
+    }
+
+    setLoading(false);
   }
 
   return {
+    loading,
     recipes,
     getRecipes,
-    clearRecipes,
   };
 }
