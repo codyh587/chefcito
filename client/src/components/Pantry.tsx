@@ -1,4 +1,15 @@
-import { Check, Eraser, Plus, Search, Settings, X } from "lucide-react";
+import { useRef, useState } from "react";
+
+import {
+  Camera,
+  Check,
+  Eraser,
+  Loader2,
+  Plus,
+  Search,
+  Settings,
+  X,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import SearchAsset from "@/assets/search.svg";
@@ -6,6 +17,11 @@ import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useIngredientSearch } from "@/hooks/useIngredientSearch";
 import { useIngredients } from "@/hooks/useIngredients";
 import { toProperCase } from "@/lib/toProperCase";
+import {
+  detectImage,
+  getProductNameFromBarcode,
+  scanBarcode,
+} from "@/lib/vision";
 
 export function Pantry() {
   const { clearPreferences } = useFoodPreferences();
@@ -18,6 +34,47 @@ export function Pantry() {
     clearIngredients,
   } = useIngredients();
 
+  const [isScanning, setIsScanning] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsScanning(true);
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = url;
+
+    img.onload = async () => {
+      try {
+        const barcode = await scanBarcode(img);
+        console.log(barcode);
+        if (barcode) {
+          const productName = await getProductNameFromBarcode(barcode);
+          if (productName) {
+            setQuery(productName.toLowerCase());
+            setIsScanning(false);
+            return; // Exit if barcode success
+          }
+        }
+
+        const detections = await detectImage(img);
+
+        if (detections.detections && detections.detections.length > 0) {
+          const foodName = detections.detections[0].categories[0].categoryName;
+          setQuery(foodName.toLowerCase());
+        }
+      } catch (err) {
+        console.error("Scanning error:", err);
+      } finally {
+        setIsScanning(false);
+        URL.revokeObjectURL(url);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+    };
+  };
+
   return (
     <div className="flex flex-1 flex-col p-5 pb-0">
       {/* header */}
@@ -25,34 +82,61 @@ export function Pantry() {
         <div className="px-0.5 text-3xl font-extrabold tracking-wide">
           Pantry
         </div>
+
+        {/* Hidden Camera Input */}
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          ref={fileInputRef}
+          onChange={handleScan}
+        />
+
+        <motion.button
+          onClick={() => fileInputRef.current?.click()}
+          whileTap={{ scale: 0.9 }}
+          disabled={isScanning}
+          className="mt-0.5 ml-auto flex h-10 w-10 items-center justify-center"
+        >
+          {isScanning ? (
+            <Loader2 size="2rem" className="animate-spin" />
+          ) : (
+            <Camera size="2rem" />
+          )}
+        </motion.button>
+
         <motion.button
           onClick={clearIngredients}
           whileTap={{ scale: 0.9 }}
-          className="mt-0.5 ml-auto"
+          className="mt-0.5 ml-6"
         >
           <Eraser size="2rem" />
         </motion.button>
         <motion.button
           onClick={clearPreferences}
           whileTap={{ scale: 0.9 }}
-          className="mt-1 ml-7"
+          className="mt-1 ml-6"
         >
           <Settings size="2rem" />
         </motion.button>
       </div>
+
       {/* search box */}
       <div className="relative z-10 -mb-5">
         <Search className="text-muted-foreground absolute top-1/2 left-4 h-6 -translate-y-1/2" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onBlur={() => setQuery("")}
-          placeholder="Search ingredients..."
+          placeholder={
+            isScanning ? "Identifying food..." : "Search ingredients..."
+          }
           className="text-muted-foreground bg-background w-full rounded-3xl border-4 border-yellow-400 py-3 pr-4 pl-12 text-lg font-medium transition-colors duration-500 outline-none focus:border-orange-400"
         />
+
         {/* search results */}
         <AnimatePresence>
-          {results.length && (
+          {results.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -62,7 +146,10 @@ export function Pantry() {
               {results.map((item) => (
                 <button
                   key={item.name}
-                  onClick={() => addIngredient(item)}
+                  onClick={() => {
+                    addIngredient(item);
+                    setQuery(""); // Reset search after adding
+                  }}
                   className="flex items-center gap-x-2 border-b p-3 transition-colors duration-300 active:bg-yellow-50"
                 >
                   <div className="-translate-y-0.5 text-3xl">{item.emoji}</div>
@@ -80,9 +167,9 @@ export function Pantry() {
           )}
         </AnimatePresence>
       </div>
+
       {/* ingredients list */}
       {ingredients.length === 0 ? (
-        // empty state
         <div className="m-auto text-center">
           <img
             src={SearchAsset}
@@ -91,16 +178,16 @@ export function Pantry() {
           />
           <div className="mb-1 text-2xl font-medium">No ingredients yet.</div>
           <div className="text-muted-foreground text-lg">
-            Add ingredients to start cooking!
+            Scan or search to add items!
           </div>
         </div>
       ) : (
-        // non-empty state
         <div className="flex flex-1 basis-0 flex-col gap-y-3 overflow-y-auto pt-8 pb-5">
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {ingredients.map((item) => (
               <motion.div
                 key={item.name}
+                layout
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
@@ -113,7 +200,7 @@ export function Pantry() {
                 </div>
                 <button
                   onClick={() => removeIngredient(item)}
-                  className="text-muted-foreground ml-auto h-7 w-7 rounded-full"
+                  className="text-muted-foreground ml-auto h-7 w-7 rounded-full transition-colors hover:bg-green-200"
                 >
                   <X className="h-5" />
                 </button>
