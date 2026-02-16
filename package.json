@@ -1,5 +1,9 @@
 {
   "devDependencies": {
     "babel-plugin-react-compiler": "^1.0.0"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.32",
+    "barcode-detector": "^3.0.8"
   }
 }
