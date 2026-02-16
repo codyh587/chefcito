@@ -15,7 +15,7 @@ export type FoodPreferences = {
   cuisine: string;
   sweetOrSavory: string;
   surveyFinished: boolean;
-  buttonReady: boolean;
+  recipesReady: boolean;
 };
 
 type FoodPreferencesContextType = {
@@ -49,7 +49,7 @@ export function FoodPreferencesProvider({ children }: PropsWithChildren) {
       } catch (error) {
         console.error("Error loading preferences from cache:", error);
       }
-      return { surveyFinished: false };
+      return { surveyFinished: false, recipesReady: false };
     },
   );
 
@@ -69,7 +69,7 @@ export function FoodPreferencesProvider({ children }: PropsWithChildren) {
   }
 
   function clearPreferences() {
-    setPreferences({ surveyFinished: false });
+    setPreferences({ surveyFinished: false, recipesReady: false });
   }
 
   return (

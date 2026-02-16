@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import {
   Bookmark,
   ChefHat,
@@ -18,10 +20,20 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useRecipes } from "@/hooks/useRecipes";
 
 export function Recipes() {
+  const {
+    preferences: { recipesReady },
+  } = useFoodPreferences();
   const { loading, recipes, getRecipes } = useRecipes();
+
+  useEffect(() => {
+    if (recipesReady || recipes.length === 0) {
+      getRecipes();
+    }
+  }, [recipesReady, getRecipes, recipes]);
 
   return (
     <div className="flex flex-1 flex-col p-5 pb-0">

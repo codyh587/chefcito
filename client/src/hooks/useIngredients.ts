@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
+
 const LOCAL_STORAGE_KEY = "chefcito_ingredients";
 
 export type Ingredient = {
@@ -8,6 +10,8 @@ export type Ingredient = {
 };
 
 export function useIngredients() {
+  const { updatePreferences } = useFoodPreferences();
+
   const [ingredients, setIngredients] = useState<Ingredient[]>(() => {
     try {
       const storedPreferences = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -28,13 +32,15 @@ export function useIngredients() {
     } catch (error) {
       console.error("Error saving preferences to cache:", error);
     }
-  }, [ingredients]);
+  }, [ingredients, updatePreferences]);
 
   function hasIngredient(ingredient: Ingredient) {
     return ingredients.some((item) => item.name === ingredient.name);
   }
 
   function addIngredient(newIngredient: Ingredient) {
+    updatePreferences({ recipesReady: true });
+
     setIngredients((prev) =>
       prev.some((item) => item.name === newIngredient.name)
         ? prev
@@ -43,6 +49,8 @@ export function useIngredients() {
   }
 
   function removeIngredient(ingredientToRemove: Ingredient) {
+    updatePreferences({ recipesReady: ingredients.length > 1 });
+
     setIngredients((prev) =>
       prev.filter((ingredient) => ingredient.name !== ingredientToRemove.name),
     );

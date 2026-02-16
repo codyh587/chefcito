@@ -18,7 +18,7 @@ export type Recipe = {
 };
 
 export function useRecipes() {
-  const { preferences } = useFoodPreferences();
+  const { preferences, updatePreferences } = useFoodPreferences();
   const { ingredientsToStringArray } = useIngredients();
 
   const [loading, setLoading] = useState(false);
@@ -47,7 +47,6 @@ export function useRecipes() {
       return;
     }
 
-    setRecipes([]);
     setLoading(true);
 
     try {
@@ -69,9 +68,9 @@ export function useRecipes() {
 
       const body = await response.json();
       setRecipes(body.data || []);
+      updatePreferences({ recipesReady: false });
     } catch (error) {
       console.error("Failed to fetch recipes:", error);
-      setRecipes([]);
     }
 
     setLoading(false);
