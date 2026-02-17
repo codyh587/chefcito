@@ -82,7 +82,6 @@ export function Pantry() {
         <div className="px-0.5 text-3xl font-extrabold tracking-wide">
           Pantry
         </div>
-
         {/* Hidden Camera Input */}
         <input
           type="file"
@@ -92,7 +91,6 @@ export function Pantry() {
           ref={fileInputRef}
           onChange={handleScan}
         />
-
         <motion.button
           onClick={() => fileInputRef.current?.click()}
           whileTap={{ scale: 0.9 }}
@@ -105,23 +103,21 @@ export function Pantry() {
             <Camera size="2rem" />
           )}
         </motion.button>
-
         <motion.button
           onClick={clearIngredients}
           whileTap={{ scale: 0.9 }}
-          className="mt-0.5 ml-6"
+          className="mt-0.5 ml-7"
         >
           <Eraser size="2rem" />
         </motion.button>
         <motion.button
           onClick={clearPreferences}
           whileTap={{ scale: 0.9 }}
-          className="mt-1 ml-6"
+          className="mt-1 ml-7"
         >
           <Settings size="2rem" />
         </motion.button>
       </div>
-
       {/* search box */}
       <div className="relative z-10 -mb-5">
         <Search className="text-muted-foreground absolute top-1/2 left-4 h-6 -translate-y-1/2" />
@@ -133,10 +129,9 @@ export function Pantry() {
           }
           className="text-muted-foreground bg-background w-full rounded-3xl border-4 border-yellow-400 py-3 pr-4 pl-12 text-lg font-medium transition-colors duration-500 outline-none focus:border-orange-400"
         />
-
         {/* search results */}
         <AnimatePresence>
-          {results.length > 0 && (
+          {results.length && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -146,10 +141,7 @@ export function Pantry() {
               {results.map((item) => (
                 <button
                   key={item.name}
-                  onClick={() => {
-                    addIngredient(item);
-                    setQuery(""); // Reset search after adding
-                  }}
+                  onClick={() => addIngredient(item)}
                   className="flex items-center gap-x-2 border-b p-3 transition-colors duration-300 active:bg-yellow-50"
                 >
                   <div className="-translate-y-0.5 text-3xl">{item.emoji}</div>
@@ -167,9 +159,9 @@ export function Pantry() {
           )}
         </AnimatePresence>
       </div>
-
       {/* ingredients list */}
       {ingredients.length === 0 ? (
+        // empty state
         <div className="m-auto text-center">
           <img
             src={SearchAsset}
@@ -178,12 +170,13 @@ export function Pantry() {
           />
           <div className="mb-1 text-2xl font-medium">No ingredients yet.</div>
           <div className="text-muted-foreground text-lg">
-            Scan or search to add items!
+            Add ingredients to start cooking!
           </div>
         </div>
       ) : (
+        // non-empty state
         <div className="flex flex-1 basis-0 flex-col gap-y-3 overflow-y-auto pt-8 pb-5">
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence>
             {ingredients.map((item) => (
               <motion.div
                 key={item.name}
@@ -200,7 +193,7 @@ export function Pantry() {
                 </div>
                 <button
                   onClick={() => removeIngredient(item)}
-                  className="text-muted-foreground ml-auto h-7 w-7 rounded-full transition-colors hover:bg-green-200"
+                  className="text-muted-foreground ml-auto h-7 w-7 rounded-full"
                 >
                   <X className="h-5" />
                 </button>

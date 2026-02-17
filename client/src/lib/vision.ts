@@ -1,8 +1,7 @@
 import { FilesetResolver, ObjectDetector } from "@mediapipe/tasks-vision";
-// This is a google service
 import { BarcodeDetector } from "barcode-detector";
 
-export const detectImage = async (imageElement: HTMLImageElement) => {
+export async function detectImage(imageElement: HTMLImageElement) {
   const vision = await FilesetResolver.forVisionTasks(
     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm",
   );
@@ -17,9 +16,9 @@ export const detectImage = async (imageElement: HTMLImageElement) => {
   });
 
   return detector.detect(imageElement);
-};
+}
 
-export const scanBarcode = async (imageElement: HTMLImageElement) => {
+export async function scanBarcode(imageElement: HTMLImageElement) {
   const barcodeDetector = new BarcodeDetector({
     formats: ["ean_13", "ean_8", "upc_a", "upc_e", "qr_code"],
   });
@@ -34,12 +33,12 @@ export const scanBarcode = async (imageElement: HTMLImageElement) => {
     console.error("Barcode detection error:", error);
     return null;
   }
-};
+}
 
-export const getProductNameFromBarcode = async (barcode: string) => {
+export async function getProductNameFromBarcode(barcode: string) {
   try {
     const response = await fetch(
-      `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+      `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`,
     );
     const data = await response.json();
     if (data.status === 1 && data.product) {
@@ -49,4 +48,4 @@ export const getProductNameFromBarcode = async (barcode: string) => {
   } catch (err) {
     return null;
   }
-};
+}
