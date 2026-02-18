@@ -23,12 +23,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import CookingPotAsset from "@/assets/cookingPot.svg";
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useRecipes } from "@/hooks/useRecipes";
+import { useSavedRecipes } from "@/hooks/useSavedRecipes";
 
 export function Recipes() {
   const {
     preferences: { recipesReady },
   } = useFoodPreferences();
   const { loading, recipes, getRecipes } = useRecipes();
+  const { isSavedRecipe, toggleSavedRecipe } = useSavedRecipes();
 
   useEffect(() => {
     if (recipesReady) {
@@ -58,9 +60,9 @@ export function Recipes() {
         {/* loading skeleton */}
         {loading ? (
           <>
-            {[1, 2, 3].map((item) => (
+            {[1, 2, 3].map((_) => (
               <Skeleton
-                key={item}
+                key={_}
                 className="border-accent/50 flex flex-col gap-y-6 rounded-3xl border-4 bg-transparent pt-4 pr-5 pb-6.5 pl-5.5"
               >
                 <div className="-mb-1 -ml-0.5 flex items-center gap-x-2">
@@ -118,13 +120,13 @@ export function Recipes() {
                       <Bookmark
                         onClick={(e) => {
                           e.stopPropagation();
-                          alert("Saved recipes coming soon!");
+                          toggleSavedRecipe(recipe);
                         }}
-                        className="text-muted-foreground ml-auto stroke-[1.5]"
+                        className={`text-muted-foreground ml-auto shrink-0 stroke-[1.5] ${isSavedRecipe(recipe) && "fill-purple-500 stroke-purple-500"}`}
                       />
                       <ChevronRight
                         size="1.75rem"
-                        className="text-muted-foreground -mr-1 ml-1.5 stroke-[1.5]"
+                        className="text-muted-foreground -mr-1 ml-1.5 shrink-0 stroke-[1.5]"
                       />
                     </div>
                     {/* category */}
@@ -193,8 +195,8 @@ export function Recipes() {
                     Ingredients
                   </DialogHeader>
                   <ol className="list-disc space-y-1.5 pl-4 text-sm">
-                    {recipe.ingredients.map((item, index) => (
-                      <li key={index}>{item}</li>
+                    {recipe.ingredients.map((ingredient, index) => (
+                      <li key={index}>{ingredient}</li>
                     ))}
                   </ol>
                   {/* directions */}
@@ -202,8 +204,8 @@ export function Recipes() {
                     Directions
                   </DialogHeader>
                   <ol className="list-decimal space-y-1.5 pb-1.5 pl-4 text-sm">
-                    {recipe.directions.map((item, index) => (
-                      <li key={index}>{item}</li>
+                    {recipe.directions.map((direction, index) => (
+                      <li key={index}>{direction}</li>
                     ))}
                   </ol>
                 </DialogContent>

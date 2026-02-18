@@ -16,7 +16,11 @@ export function useIngredientSearch(resultLimit: number = 10) {
     .search(query)
     .slice(0, resultLimit)
     .map(
-      (r) => ({ name: r.item, emoji: ingredientData[r.item] }) as Ingredient,
+      (result) =>
+        ({
+          name: result.item,
+          emoji: ingredientData[result.item],
+        }) as Ingredient,
     );
 
   useEffect(() => {
@@ -34,10 +38,12 @@ export function useIngredientSearch(resultLimit: number = 10) {
         .search(query)
         .slice(0, 1)
         .map(
-          (r) =>
-            ({ name: r.item, emoji: ingredientData[r.item] }) as Ingredient,
+          (result) =>
+            ({
+              name: result.item,
+              emoji: ingredientData[result.item],
+            }) as Ingredient,
         );
-
       results.push(...result);
     });
 

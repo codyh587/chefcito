@@ -82,7 +82,7 @@ export function Pantry() {
         </div>
 
         {/* Hidden Camera Input */}
-        <input
+        {/* <input
           type="file"
           accept="image/*"
           capture="environment"
@@ -101,12 +101,12 @@ export function Pantry() {
           ) : (
             <Camera size="2rem" />
           )}
-        </motion.button>
+        </motion.button> */}
 
         <motion.button
           onClick={clearIngredients}
           whileTap={{ scale: 0.9 }}
-          className="mt-0.5 ml-7"
+          className="mt-0.5 ml-auto"
         >
           <Eraser size="2rem" />
         </motion.button>
@@ -139,17 +139,19 @@ export function Pantry() {
               exit={{ opacity: 0, y: -10 }}
               className="absolute z-10 mt-2.5 flex max-h-62 w-full flex-col overflow-y-scroll rounded-3xl border-4 border-yellow-400 bg-white shadow-2xl"
             >
-              {results.map((item) => (
+              {results.map((ingredient) => (
                 <button
-                  key={item.name}
-                  onClick={() => addIngredient(item)}
+                  key={ingredient.name}
+                  onClick={() => addIngredient(ingredient)}
                   className="flex items-center gap-x-2 border-b p-3 transition-colors duration-300 active:bg-yellow-50"
                 >
-                  <div className="-translate-y-0.5 text-3xl">{item.emoji}</div>
-                  <div className="text-lg font-medium">
-                    {toProperCase(item.name)}
+                  <div className="-translate-y-0.5 text-3xl">
+                    {ingredient.emoji}
                   </div>
-                  {hasIngredient(item) ? (
+                  <div className="text-lg font-medium">
+                    {toProperCase(ingredient.name)}
+                  </div>
+                  {hasIngredient(ingredient) ? (
                     <Check className="ml-auto h-5 text-green-500" />
                   ) : (
                     <Plus className="text-muted-foreground ml-auto h-5" />
@@ -178,9 +180,9 @@ export function Pantry() {
         // non-empty state
         <div className="flex flex-1 basis-0 flex-col gap-y-3 overflow-y-auto pt-8 pb-5">
           <AnimatePresence>
-            {ingredients.map((item) => (
+            {ingredients.map((ingredient) => (
               <motion.div
-                key={item.name}
+                key={ingredient.name}
                 layout
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -188,12 +190,14 @@ export function Pantry() {
                 transition={{ type: "spring", stiffness: 600, damping: 50 }}
                 className="flex items-center gap-x-1.5 rounded-3xl border-4 border-green-500 bg-linear-to-r from-green-50 to-green-100 p-2"
               >
-                <div className="-translate-y-0.5 text-3xl">{item.emoji}</div>
+                <div className="-translate-y-0.5 text-3xl">
+                  {ingredient.emoji}
+                </div>
                 <div className="truncate text-lg font-medium">
-                  {toProperCase(item.name)}
+                  {toProperCase(ingredient.name)}
                 </div>
                 <button
-                  onClick={() => removeIngredient(item)}
+                  onClick={() => removeIngredient(ingredient)}
                   className="text-muted-foreground ml-auto h-7 w-7 rounded-full"
                 >
                   <X className="h-5" />

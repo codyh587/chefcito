@@ -24,7 +24,7 @@ export function useIngredients() {
     return [];
   });
 
-  const ingredientsToStringArray = ingredients.map((item) => item.name);
+  const ingredientsToStringArray = ingredients.map((ingredient) => ingredient.name);
 
   useEffect(() => {
     try {
@@ -35,24 +35,22 @@ export function useIngredients() {
   }, [ingredients, updatePreferences]);
 
   function hasIngredient(ingredient: Ingredient) {
-    return ingredients.some((item) => item.name === ingredient.name);
+    return ingredients.some((ing) => ing.name === ingredient.name);
   }
 
-  function addIngredient(newIngredient: Ingredient) {
+  function addIngredient(ingredient: Ingredient) {
     updatePreferences({ recipesReady: true });
-
     setIngredients((prev) =>
-      prev.some((item) => item.name === newIngredient.name)
+      prev.some((ing) => ing.name === ingredient.name)
         ? prev
-        : [...prev, newIngredient],
+        : [...prev, ingredient],
     );
   }
 
-  function removeIngredient(ingredientToRemove: Ingredient) {
+  function removeIngredient(ingredient: Ingredient) {
     updatePreferences({ recipesReady: ingredients.length > 1 });
-
     setIngredients((prev) =>
-      prev.filter((ingredient) => ingredient.name !== ingredientToRemove.name),
+      prev.filter((ing) => ing.name !== ingredient.name),
     );
   }
 

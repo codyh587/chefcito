@@ -39,10 +39,12 @@ export async function foodVision(imageElement: HTMLImageElement) {
   const result =
     classifier.classify(imageElement).classifications[0].categories;
 
-  const aboveThreshold = result.filter((c) => c.score >= 0.2);
+  const aboveThreshold = result.filter((category) => category.score >= 0.2);
   if (aboveThreshold.length > 0) {
-    return aboveThreshold.map((c) => c.categoryName);
+    return aboveThreshold.map((category) => category.categoryName);
   }
 
-  return result.filter((c) => c.score > 0.01).map((c) => c.categoryName);
+  return result
+    .filter((category) => category.score > 0.01)
+    .map((category) => category.categoryName);
 }
