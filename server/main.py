@@ -27,6 +27,7 @@ with open("clean_recipes.jsonl", encoding="utf-8") as fin:
 
 METAS = [extract_metadata(r) for r in recipes]
 IDF = build_idf(METAS)
+ID_TO_RECIPE = {r["recipe_id"]: r for r in recipes}
 
 
 class RecommendBody(BaseModel):
@@ -39,6 +40,7 @@ class RecommendBody(BaseModel):
     protein_filled: bool
     loose: bool
     limit: int
+    liked: set[int]
 
 
 @app.post("/recommend")
@@ -48,7 +50,7 @@ def post_recommend(body: RecommendBody):
         metas=METAS,
         idf=IDF,
         intent=body.model_dump(),
-        liked=[],
+        liked=[ID_TO_RECIPE[recipe_id] for recipe_id in body.liked],
         disliked=[],
         k=body.limit,
     )
