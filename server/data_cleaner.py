@@ -114,12 +114,12 @@ for entry in noParens:
 #     for entry in noUnicodes:
 #         print(json.dumps(entry), file=f)
 
-test = noDupes.copy()
+cleaned_recipes = noDupes.copy()
 x = 0
-for line in test:
-    line["ingredients"] = noUnicodes[x]
+for line in cleaned_recipes:
+    line["clean_ingredients"] = noUnicodes[x]
     x += 1
 
 with open("clean_recipes.jsonl", "w", encoding="utf-8") as f:
-    for line in test:
+    for line in cleaned_recipes:
         print(json.dumps(line, ensure_ascii=False), file=f)
