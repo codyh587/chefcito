@@ -10,11 +10,23 @@ function getClassifier(): Promise<ImageClassifier> {
       ImageClassifier.createFromOptions(vision, {
         baseOptions: {
           modelAssetPath:
-            "https://storage.googleapis.com/mediapipe-models/image_classifier/efficientnet_lite0/int8/latest/efficientnet_lite0.tflite",
+            "https://storage.googleapis.com/mediapipe-models/image_classifier/efficientnet_lite0/float32/latest/efficientnet_lite0.tflite",
         },
         runningMode: "IMAGE",
         maxResults: 10,
-        // scoreThreshold: 0.25,
+        categoryDenylist: [
+          "refrigerator",
+          "shopping basket",
+          "hamper",
+          "shopping cart",
+          "grocery store",
+          "tennis ball",
+          "bakery",
+          "medicine chest",
+          "plate rack",
+          "butcher shop",
+          "crate",
+        ],
       }),
     );
   }
@@ -24,8 +36,13 @@ function getClassifier(): Promise<ImageClassifier> {
 
 export async function foodVision(imageElement: HTMLImageElement) {
   const classifier = await getClassifier();
-  const result = classifier.classify(imageElement);
-  console.log(result);
+  const result =
+    classifier.classify(imageElement).classifications[0].categories;
 
-  return result.classifications[0].categories.map((c) => c.categoryName);
+  const aboveThreshold = result.filter((c) => c.score >= 0.2);
+  if (aboveThreshold.length > 0) {
+    return aboveThreshold.map((c) => c.categoryName);
+  }
+
+  return result.filter((c) => c.score > 0.01).map((c) => c.categoryName);
 }
