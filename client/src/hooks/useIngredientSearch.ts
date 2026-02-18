@@ -10,12 +10,14 @@ export function useIngredientSearch(resultLimit: number = 10) {
   const [ingredientData, setIngredientData] = useState<IngredientData>({});
   const [query, setQuery] = useState<string>("");
 
-  const fuse = new Fuse(Object.keys(ingredientData), { threshold: 0.3 });
+  const fuse = new Fuse(Object.keys(ingredientData), { threshold: 0.4 });
 
   const results = fuse
     .search(query)
-    .map((r) => ({ name: r.item, emoji: ingredientData[r.item] }) as Ingredient)
-    .slice(0, resultLimit);
+    .slice(0, resultLimit)
+    .map(
+      (r) => ({ name: r.item, emoji: ingredientData[r.item] }) as Ingredient,
+    );
 
   useEffect(() => {
     fetch("/ingredients.json")
@@ -24,5 +26,23 @@ export function useIngredientSearch(resultLimit: number = 10) {
       .catch((err) => console.error("Failed to load ingredients:", err));
   }, []);
 
-  return { query, setQuery, results };
+  function queryBatchSync(queries: string[]) {
+    const results: Ingredient[] = [];
+
+    queries.forEach((query) => {
+      const result = fuse
+        .search(query)
+        .slice(0, 1)
+        .map(
+          (r) =>
+            ({ name: r.item, emoji: ingredientData[r.item] }) as Ingredient,
+        );
+
+      results.push(...result);
+    });
+
+    return results;
+  }
+
+  return { query, setQuery, results, queryBatchSync };
 }

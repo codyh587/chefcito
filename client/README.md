@@ -5,8 +5,10 @@ Installed plugins:
 - ShadCN
 - Tailwind
 - Framer Motion
-- ESLint
 - Fuse.js (fuzzy search)
+- Barcode Scanner (barcode detection)
+- Google MediaPipe (object detection)
+- ESLint
 - Prettier (with import/Tailwind formatting)
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

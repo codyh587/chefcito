@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import CookingPotAsset from "@/assets/cooking-pot.svg";
+import CookingPotAsset from "@/assets/cookingPot.svg";
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useRecipes } from "@/hooks/useRecipes";
 

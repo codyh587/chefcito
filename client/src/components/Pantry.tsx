@@ -16,16 +16,13 @@ import SearchAsset from "@/assets/search.svg";
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useIngredientSearch } from "@/hooks/useIngredientSearch";
 import { useIngredients } from "@/hooks/useIngredients";
+import { barcodeVision } from "@/lib/barcodeVision";
+import { foodVision } from "@/lib/foodVision";
 import { toProperCase } from "@/lib/toProperCase";
-import {
-  detectImage,
-  getProductNameFromBarcode,
-  scanBarcode,
-} from "@/lib/vision";
 
 export function Pantry() {
   const { clearPreferences } = useFoodPreferences();
-  const { query, setQuery, results } = useIngredientSearch();
+  const { query, setQuery, results, queryBatchSync } = useIngredientSearch();
   const {
     ingredients,
     hasIngredient,
@@ -37,9 +34,10 @@ export function Pantry() {
   const [isScanning, setIsScanning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function handleScan(file: File | undefined) {
+    if (!file) {
+      return;
+    }
 
     setIsScanning(true);
     const url = URL.createObjectURL(file);
@@ -48,32 +46,32 @@ export function Pantry() {
 
     img.onload = async () => {
       try {
-        const barcode = await scanBarcode(img);
-        console.log(barcode);
-        if (barcode) {
-          const productName = await getProductNameFromBarcode(barcode);
-          if (productName) {
-            setQuery(productName.toLowerCase());
-            setIsScanning(false);
-            return; // Exit if barcode success
-          }
+        const barcodeScan = await barcodeVision(img);
+        let ingredients = queryBatchSync(barcodeScan);
+
+        if (ingredients.length > 0) {
+          ingredients.forEach((ing) => addIngredient(ing));
+          return;
         }
 
-        const detections = await detectImage(img);
+        const foodScan = await foodVision(img);
+        ingredients = queryBatchSync(foodScan);
 
-        if (detections.detections && detections.detections.length > 0) {
-          const foodName = detections.detections[0].categories[0].categoryName;
-          setQuery(foodName.toLowerCase());
+        if (ingredients.length > 0) {
+          ingredients.forEach((ing) => addIngredient(ing));
+          return;
         }
       } catch (err) {
         console.error("Scanning error:", err);
       } finally {
         setIsScanning(false);
         URL.revokeObjectURL(url);
-        if (fileInputRef.current) fileInputRef.current.value = "";
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
       }
     };
-  };
+  }
 
   return (
     <div className="flex flex-1 flex-col p-5 pb-0">
@@ -82,6 +80,7 @@ export function Pantry() {
         <div className="px-0.5 text-3xl font-extrabold tracking-wide">
           Pantry
         </div>
+
         {/* Hidden Camera Input */}
         <input
           type="file"
@@ -89,7 +88,7 @@ export function Pantry() {
           capture="environment"
           className="hidden"
           ref={fileInputRef}
-          onChange={handleScan}
+          onChange={(e) => handleScan(e.target?.files?.[0])}
         />
         <motion.button
           onClick={() => fileInputRef.current?.click()}
@@ -103,6 +102,7 @@ export function Pantry() {
             <Camera size="2rem" />
           )}
         </motion.button>
+
         <motion.button
           onClick={clearIngredients}
           whileTap={{ scale: 0.9 }}
@@ -124,6 +124,7 @@ export function Pantry() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onBlur={() => setQuery("")}
           placeholder={
             isScanning ? "Identifying food..." : "Search ingredients..."
           }
@@ -131,7 +132,7 @@ export function Pantry() {
         />
         {/* search results */}
         <AnimatePresence>
-          {results.length && (
+          {results.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
