@@ -12,6 +12,7 @@ export type Recipe = {
   subcategory: string;
   description: string;
   ingredients: string[];
+  clean_ingredients: string[];
   directions: string[];
   num_ingredients: number;
   num_steps: number;

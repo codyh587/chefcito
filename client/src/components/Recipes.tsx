@@ -188,6 +188,16 @@ export function Recipes() {
                   </div>
                   {/* description */}
                   <DialogDescription>{recipe.description}</DialogDescription>
+                  {/* ingredients */}
+                  <DialogHeader className="text-left text-lg font-semibold">
+                    Ingredients
+                  </DialogHeader>
+                  <ol className="list-disc space-y-1.5 pl-4 text-sm">
+                    {recipe.ingredients.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ol>
+                  {/* directions */}
                   <DialogHeader className="text-left text-lg font-semibold">
                     Directions
                   </DialogHeader>
