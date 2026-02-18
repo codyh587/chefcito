@@ -93,7 +93,7 @@ def infer_spice(norm_ingredients):
 
 
 def extract_metadata(recipe):
-    norm = [normalize_ing(i) for i in recipe["ingredients"]]
+    norm = [normalize_ing(i) for i in recipe["clean_ingredients"]]
     tokens = set()
     for i in norm:
         tokens |= tokenize_ing(i)
