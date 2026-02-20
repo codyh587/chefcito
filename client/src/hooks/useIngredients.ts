@@ -24,8 +24,6 @@ export function useIngredients() {
     return [];
   });
 
-  const ingredientsToStringArray = ingredients.map((ingredient) => ingredient.name);
-
   useEffect(() => {
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(ingredients));
@@ -60,7 +58,6 @@ export function useIngredients() {
 
   return {
     ingredients,
-    ingredientsToStringArray,
     hasIngredient,
     addIngredient,
     removeIngredient,

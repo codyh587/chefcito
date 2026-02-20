@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useFoodPreferences } from "@/contexts/FoodPreferencesContext";
 import { useIngredients } from "@/hooks/useIngredients";
+import { useSavedRecipes } from "@/hooks/useSavedRecipes";
 
 const LOCAL_STORAGE_KEY = "chefcito_recipes";
 
@@ -20,7 +21,8 @@ export type Recipe = {
 
 export function useRecipes() {
   const { preferences, updatePreferences } = useFoodPreferences();
-  const { ingredientsToStringArray } = useIngredients();
+  const { ingredients } = useIngredients();
+  const { savedRecipes } = useSavedRecipes();
 
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
@@ -55,7 +57,7 @@ export function useRecipes() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ingredients: ingredientsToStringArray,
+          ingredients: ingredients.map((ingredient) => ingredient.name),
           allergens: [],
           pastry: false,
           max_num_ingredients: 100,
@@ -64,6 +66,7 @@ export function useRecipes() {
           protein_filled: preferences.surveyFinished || false,
           loose: false,
           limit: resultLimit,
+          liked: savedRecipes.map((recipe) => recipe.recipe_id),
         }),
       });
 

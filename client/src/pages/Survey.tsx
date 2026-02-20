@@ -8,73 +8,105 @@ import {
   useFoodPreferences,
 } from "@/contexts/FoodPreferencesContext";
 
+type Option = {
+  value: any;
+  label: string;
+  emoji: string;
+  multiSelectSubmit?: boolean;
+};
+
 type Question = {
   id: keyof FoodPreferences;
   question: string;
   emoji: string;
-  options: { value: any; label: string; emoji: string }[];
+  options: Option[];
+  multiSelect?: boolean;
 };
 
 const questions: Question[] = [
   {
-    id: "spiceLevel",
-    question: "¿Cuál es tu nivel de fuego?",
-    emoji: "🔥",
+    id: "allergens",
+    question: "Do you have any allergies?",
+    emoji: "⚠️",
     options: [
-      { value: "mild", label: "El Suave", emoji: "😌" },
-      { value: "medium", label: "El Valiente", emoji: "😤" },
-      { value: "hot", label: "El Luchador", emoji: "🔥" },
-      { value: "extreme", label: "EL CAMPEÓN!", emoji: "💀" },
+      { value: "milk", label: "Dairy", emoji: "🥛" },
+      { value: "eggs", label: "Eggs", emoji: "🥚" },
+      { value: "nuts", label: "Nuts", emoji: "🥜" },
+      { value: "soy", label: "Soy", emoji: "🫘" },
+      { value: "gluten", label: "Gluten", emoji: "🌾" },
+      {
+        value: "submit",
+        label: "Done",
+        emoji: "✅",
+        multiSelectSubmit: true,
+      },
+    ],
+    multiSelect: true,
+  },
+  {
+    id: "spice",
+    question: "How much heat can you handle?",
+    emoji: "🌶️",
+    options: [
+      { value: 0, label: "None", emoji: "😁" },
+      { value: 0.25, label: "Mild", emoji: "😌" },
+      { value: 0.5, label: "Medium", emoji: "😤" },
+      { value: 0.75, label: "Hot", emoji: "🔥" },
+      { value: 1, label: "Extreme", emoji: "💀" },
     ],
   },
   {
-    id: "mealType",
-    question: "¿Cuándo entras al ring de sabor?",
-    emoji: "🍽️",
+    id: "proteinFilled",
+    question: "How important is protein to you?",
+    emoji: "💪",
     options: [
-      { value: "breakfast", label: "Batalla del Amanecer", emoji: "🌅" },
-      { value: "lunch", label: "Combate del Mediodía", emoji: "☀️" },
-      { value: "dinner", label: "Lucha Nocturna", emoji: "🌙" },
-      { value: "snacks", label: "Golpes Rápidos", emoji: "⚡" },
+      { value: true, label: "High protein, please", emoji: "🥩" },
+      { value: false, label: "Not a priority", emoji: "🥗" },
     ],
   },
   {
-    id: "protein",
-    question: "¿Cuál es tu compañero de batalla?",
-    emoji: "🍗",
+    id: "maxCookTime",
+    question: "How much time do you have to cook?",
+    emoji: "⏱️",
     options: [
-      { value: "chicken", label: "Pollo Power", emoji: "🐔" },
-      { value: "beef", label: "Toro Fuerte", emoji: "🥩" },
-      { value: "pork", label: "Puerco Punch", emoji: "🐷" },
-      { value: "seafood", label: "Ola Marina", emoji: "🦐" },
-      { value: "vegetarian", label: "Fuerza Verde", emoji: "🥬" },
+      { value: 15, label: "15 minutes", emoji: "⚡" },
+      { value: 30, label: "30 minutes", emoji: "🕐" },
+      { value: 60, label: "1 hour", emoji: "🍳" },
+      { value: 120, label: "2+ hours", emoji: "👨‍🍳" },
     ],
   },
   {
-    id: "cuisine",
-    question: "¿En qué arena peleas?",
-    emoji: "🌎",
+    id: "maxNumIngredients",
+    question: "How many ingredients are you okay working with?",
+    emoji: "🛒",
     options: [
-      { value: "mexican", label: "La Arena Mexicana", emoji: "🌮" },
-      { value: "italian", label: "El Coliseo Italiano", emoji: "🍝" },
-      { value: "asian", label: "Templo del Este", emoji: "🍜" },
-      { value: "american", label: "Ring Americano", emoji: "🍔" },
-      { value: "fusion", label: "Lucha Libre Mix", emoji: "🌍" },
+      { value: 5, label: "5 or fewer", emoji: "✌️" },
+      { value: 10, label: "Up to 10", emoji: "👌" },
+      { value: 20, label: "Up to 20", emoji: "🧑‍🍳" },
+      { value: 100, label: "No limit", emoji: "🌟" },
     ],
   },
   {
-    id: "sweetOrSavory",
-    question: "¿Dulce o Salado, luchador?",
-    emoji: "🎂",
+    id: "loose",
+    question: "How strict should we be about using only what you have on hand?",
+    emoji: "🧺",
     options: [
-      { value: "sweet", label: "Dulce Destructor", emoji: "🍰" },
-      { value: "savory", label: "Salado Supremo", emoji: "🧀" },
-      { value: "both", label: "Maestro de Todo", emoji: "👑" },
+      { value: false, label: "Strict — only my ingredients", emoji: "🔒" },
+      { value: true, label: "Flexible — extras are fine", emoji: "🔓" },
+    ],
+  },
+  {
+    id: "pastry",
+    question: "Are you in the mood for something sweet?",
+    emoji: "🍰",
+    options: [
+      { value: true, label: "Yes, show me desserts!", emoji: "🧁" },
+      { value: false, label: "No, keep it savory", emoji: "🧀" },
     ],
   },
   {
     id: "surveyFinished",
-    question: "¡Listo para la batalla culinaria!",
+    question: "You're all set!",
     emoji: "✨",
     options: [{ value: true, label: "Let's go!", emoji: "👊" }],
   },
@@ -84,19 +116,33 @@ export function Survey() {
   const { updatePreferences } = useFoodPreferences();
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   const question = questions[currentQuestion];
   const progress = (currentQuestion / (questions.length - 1)) * 100;
 
-  function handleSelect(value: string) {
-    setSelectedOption(value);
+  function handleSelect(option: Option) {
+    if (question.multiSelect && selectedOptions.includes(option.value)) {
+      setSelectedOptions((prev) => prev.filter((opt) => opt !== option.value));
+      return;
+    }
+
+    const selectionsToSave =
+      question.multiSelect && option.multiSelectSubmit
+        ? selectedOptions
+        : option.value;
+
+    setSelectedOptions((prev) => [...prev, option.value]);
+
+    if (question.multiSelect && !option.multiSelectSubmit) {
+      return;
+    }
 
     setTimeout(() => {
-      updatePreferences({ [question.id]: value });
+      updatePreferences({ [question.id]: selectionsToSave });
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
-        setSelectedOption("");
+        setSelectedOptions([]);
       }
     }, 500);
   }
@@ -157,16 +203,16 @@ export function Survey() {
                   <motion.button
                     key={option.value}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleSelect(option.value)}
+                    onClick={() => handleSelect(option)}
                     className={`flex items-center gap-x-3 rounded-2xl border-4 p-4 text-left font-bold transition-all duration-300 ${
-                      selectedOption === option.value
+                      selectedOptions.includes(option.value)
                         ? "border-green-500 bg-green-100 text-green-800"
                         : "border-gray-300 bg-linear-to-r from-yellow-50 to-red-50 text-gray-800 active:border-yellow-300"
                     }`}
                   >
                     <div className="text-3xl">{option.emoji}</div>
                     <div className="text-lg">{option.label}</div>
-                    {selectedOption === option.value ? (
+                    {selectedOptions.includes(option.value) ? (
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1, rotate: 360 }}

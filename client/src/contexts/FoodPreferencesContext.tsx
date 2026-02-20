@@ -9,11 +9,13 @@ import {
 const LOCAL_STORAGE_KEY = "chefcito_food_preferences";
 
 export type FoodPreferences = {
-  spiceLevel: string;
-  mealType: string;
-  protein: string;
-  cuisine: string;
-  sweetOrSavory: string;
+  allergens: string[];
+  pastry: boolean;
+  maxNumIngredients: number;
+  maxCookTime: number;
+  spice: number;
+  proteinFilled: boolean;
+  loose: boolean;
   surveyFinished: boolean;
   recipesReady: boolean;
 };
