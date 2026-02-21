@@ -1,11 +1,11 @@
 import { useRef, useState } from "react";
 
 import {
-  Camera,
   Check,
   Eraser,
   Loader2,
   Plus,
+  ScanBarcode,
   Search,
   Settings,
   X,
@@ -31,10 +31,10 @@ export function Pantry() {
     clearIngredients,
   } = useIngredients();
 
-  const [isScanning, setIsScanning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isScanning, setIsScanning] = useState(false);
 
-  async function handleScan(file: File | undefined) {
+  async function handleScan(file?: File) {
     if (!file) {
       return;
     }
@@ -44,33 +44,34 @@ export function Pantry() {
     const img = new Image();
     img.src = url;
 
-    img.onload = async () => {
-      try {
-        const barcodeScan = await barcodeVision(img);
-        let ingredients = queryBatchSync(barcodeScan);
+    try {
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("Failed to load image"));
+      });
 
-        if (ingredients.length > 0) {
-          ingredients.forEach((ing) => addIngredient(ing));
-          return;
-        }
+      const barcodeScan = await barcodeVision(img);
+      let ingredients = queryBatchSync(barcodeScan);
 
+      if (ingredients.length === 0) {
         const foodScan = await foodVision(img);
         ingredients = queryBatchSync(foodScan);
-
-        if (ingredients.length > 0) {
-          ingredients.forEach((ing) => addIngredient(ing));
-          return;
-        }
-      } catch (err) {
-        console.error("Scanning error:", err);
-      } finally {
-        setIsScanning(false);
-        URL.revokeObjectURL(url);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
       }
-    };
+
+      if (!fileInputRef.current) {
+        return;
+      }
+
+      ingredients.forEach((ing) => addIngredient(ing));
+    } catch (error) {
+      console.error("Scanning error:", error);
+    } finally {
+      URL.revokeObjectURL(url);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+        setIsScanning(false);
+      }
+    }
   }
 
   return (
@@ -80,29 +81,6 @@ export function Pantry() {
         <div className="px-0.5 text-3xl font-extrabold tracking-wide">
           Pantry
         </div>
-
-        {/* Hidden Camera Input */}
-        {/* <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-          ref={fileInputRef}
-          onChange={(e) => handleScan(e.target?.files?.[0])}
-        />
-        <motion.button
-          onClick={() => fileInputRef.current?.click()}
-          whileTap={{ scale: 0.9 }}
-          disabled={isScanning}
-          className="mt-0.5 ml-auto flex h-10 w-10 items-center justify-center"
-        >
-          {isScanning ? (
-            <Loader2 size="2rem" className="animate-spin" />
-          ) : (
-            <Camera size="2rem" />
-          )}
-        </motion.button> */}
-
         <motion.button
           onClick={clearIngredients}
           whileTap={{ scale: 0.9 }}
@@ -128,8 +106,24 @@ export function Pantry() {
           placeholder={
             isScanning ? "Identifying food..." : "Search ingredients..."
           }
-          className="text-muted-foreground bg-background w-full rounded-3xl border-4 border-yellow-400 py-3 pr-4 pl-12 text-lg font-medium transition-colors duration-500 outline-none focus:border-orange-400"
+          className="text-muted-foreground bg-background w-full rounded-3xl border-4 border-yellow-400 px-12 py-3 text-lg font-medium transition-colors duration-500 outline-none focus:border-orange-400"
         />
+        <motion.button
+          onClick={() => fileInputRef.current?.click()}
+          whileTap={{ scale: 0.9 }}
+          disabled={isScanning}
+          className="text-muted-foreground absolute top-1/2 right-4 -translate-y-1/2"
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={(e) => handleScan(e.target?.files?.[0])}
+            className="hidden"
+          />
+          {isScanning ? <Loader2 className="animate-spin" /> : <ScanBarcode />}
+        </motion.button>
         {/* search results */}
         <AnimatePresence>
           {results.length > 0 && (

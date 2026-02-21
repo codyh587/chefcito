@@ -10,7 +10,7 @@ export function useIngredientSearch(resultLimit: number = 10) {
   const [ingredientData, setIngredientData] = useState<IngredientData>({});
   const [query, setQuery] = useState<string>("");
 
-  const fuse = new Fuse(Object.keys(ingredientData), { threshold: 0.4 });
+  const fuse = new Fuse(Object.keys(ingredientData), { threshold: 0.35 });
 
   const results = fuse
     .search(query)

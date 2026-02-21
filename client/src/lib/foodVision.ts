@@ -13,7 +13,7 @@ function getClassifier(): Promise<ImageClassifier> {
             "https://storage.googleapis.com/mediapipe-models/image_classifier/efficientnet_lite0/float32/latest/efficientnet_lite0.tflite",
         },
         runningMode: "IMAGE",
-        maxResults: 10,
+        maxResults: 5,
         categoryDenylist: [
           "refrigerator",
           "shopping basket",

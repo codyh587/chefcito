@@ -152,7 +152,7 @@ export function Survey() {
   }
 
   return (
-    <div className="bg-chefcito relative min-h-screen p-10">
+    <div className="bg-chefcito relative min-h-dvh p-10">
       <AnimatePresence>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}

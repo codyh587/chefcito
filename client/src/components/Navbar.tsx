@@ -20,9 +20,9 @@ export function Navbar({
       <motion.button
         onClick={() => setPage("pantry")}
         whileTap={{ scale: 0.9 }}
-        className="m-auto flex-1 py-3"
+        className="m-auto flex-1 py-3 text-sm"
       >
-        <ShoppingBasket className="m-auto" size="2rem" />
+        <ShoppingBasket className="m-auto" size="1.75rem" />
         Pantry
       </motion.button>
       <div className="flex-1">
@@ -31,15 +31,15 @@ export function Navbar({
           whileTap={{ scale: 0.9 }}
           src="/logo.svg"
           draggable={false}
-          className={`absolute bottom-4 left-1/2 h-24 -translate-x-1/2 rounded-full outline [transition:filter_0.4s,rotate_0.4s] ${!recipesReady && "-rotate-10 grayscale"}`}
+          className={`absolute bottom-4 left-1/2 h-20 -translate-x-1/2 rounded-full outline [transition:filter_0.4s,rotate_0.4s] ${!recipesReady && "-rotate-10 grayscale"}`}
         />
       </div>
       <motion.button
         onClick={() => setPage("saved")}
         whileTap={{ scale: 0.9 }}
-        className="m-auto flex-1 py-3"
+        className="m-auto flex-1 py-3 text-sm"
       >
-        <Bookmark className="m-auto" size="2rem" />
+        <Bookmark className="m-auto" size="1.75rem" />
         Saved
       </motion.button>
     </div>

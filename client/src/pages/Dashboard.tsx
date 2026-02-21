@@ -11,7 +11,7 @@ export function Dashboard() {
   const [page, setPage] = useState<Page>("pantry");
 
   return (
-    <div className="bg-background relative flex min-h-screen flex-col">
+    <div className="bg-background relative flex min-h-dvh flex-col">
       {page === "pantry" ? (
         <Pantry />
       ) : page === "recipes" ? (
