@@ -1,14 +1,11 @@
-# main.py
 import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from recommender import (
-    recommend,
-    extract_metadata,
-    build_idf
-)
+from emoji_generator import find_best_food_emoji
+from recommender import recommend, extract_metadata, build_idf
+
 
 app = FastAPI()
 
@@ -20,14 +17,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-recipes = []
+
+RECIPES = []
 with open("clean_recipes.jsonl", encoding="utf-8") as fin:
     for line in fin:
-        recipes.append(json.loads(line))
+        RECIPES.append(json.loads(line))
 
-METAS = [extract_metadata(r) for r in recipes]
+METAS = [extract_metadata(r) for r in RECIPES]
 IDF = build_idf(METAS)
-ID_TO_RECIPE = {r["recipe_id"]: r for r in recipes}
+ID_TO_RECIPE = {r["recipe_id"]: r for r in RECIPES}
 
 
 class RecommendBody(BaseModel):
@@ -45,17 +43,21 @@ class RecommendBody(BaseModel):
 
 @app.post("/recommend")
 def post_recommend(body: RecommendBody):
-    results = recommend(
-        recipes=recipes,
+    recipes = []
+
+    for _, recipe in recommend(
+        recipes=RECIPES,
         metas=METAS,
         idf=IDF,
         intent=body.model_dump(),
         liked=[ID_TO_RECIPE[recipe_id] for recipe_id in body.liked],
         disliked=[],
         k=body.limit,
-    )
+    ):
+        recipe["emoji"] = find_best_food_emoji(
+            recipe["recipe_title"], recipe["category"], recipe["subcategory"]
+        )[0]
 
+        recipes.append(recipe)
 
-    clean_data = [item[1] for item in results]
-
-    return {"data": clean_data}
+    return {"data": recipes}

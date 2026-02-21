@@ -9,6 +9,7 @@ const LOCAL_STORAGE_KEY = "chefcito_recipes";
 export type Recipe = {
   recipe_id: number;
   recipe_title: string;
+  emoji: string;
   category: string;
   subcategory: string;
   description: string;
