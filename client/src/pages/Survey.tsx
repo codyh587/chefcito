@@ -36,7 +36,7 @@ const questions: Question[] = [
       { value: "gluten", label: "Gluten", emoji: "🌾" },
       {
         value: "submit",
-        label: "Done",
+        label: "All done!",
         emoji: "✅",
         multiSelectSubmit: true,
       },
@@ -51,7 +51,7 @@ const questions: Question[] = [
       { value: 0, label: "None", emoji: "😁" },
       { value: 0.25, label: "Mild", emoji: "😌" },
       { value: 0.5, label: "Medium", emoji: "😤" },
-      { value: 0.75, label: "Hot", emoji: "🔥" },
+      { value: 0.75, label: "Hot", emoji: "🥵" },
       { value: 1, label: "Extreme", emoji: "💀" },
     ],
   },
@@ -60,7 +60,7 @@ const questions: Question[] = [
     question: "How important is protein to you?",
     emoji: "💪",
     options: [
-      { value: true, label: "High protein, please", emoji: "🥩" },
+      { value: true, label: "High protein, please!", emoji: "🥩" },
       { value: false, label: "Not a priority", emoji: "🥗" },
     ],
   },
@@ -88,11 +88,15 @@ const questions: Question[] = [
   },
   {
     id: "loose",
-    question: "How strict should we be about using only what you have on hand?",
+    question: "How strict should we be about using what you have?",
     emoji: "🧺",
     options: [
-      { value: false, label: "Strict — only my ingredients", emoji: "🔒" },
-      { value: true, label: "Flexible — extras are fine", emoji: "🔓" },
+      { value: false, label: "Only use my ingredients", emoji: "🔒" },
+      {
+        value: true,
+        label: "Extra ingredients are okay!",
+        emoji: "🔓",
+      },
     ],
   },
   {
@@ -101,12 +105,12 @@ const questions: Question[] = [
     emoji: "🍰",
     options: [
       { value: true, label: "Yes, show me desserts!", emoji: "🧁" },
-      { value: false, label: "No, keep it savory", emoji: "🧀" },
+      { value: false, label: "No, keep it savory", emoji: "🍔" },
     ],
   },
   {
     id: "surveyFinished",
-    question: "You're all set!",
+    question: "Alright, you're all set!",
     emoji: "✨",
     options: [{ value: true, label: "Let's go!", emoji: "👊" }],
   },

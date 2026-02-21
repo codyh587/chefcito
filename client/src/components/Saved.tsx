@@ -50,7 +50,7 @@ export function Saved() {
             />
             <div className="mb-1 text-2xl font-medium">No recipes saved.</div>
             <div className="text-muted-foreground text-lg">
-              Find and save recipes to view them here!
+              Find and save recipes to show them here!
             </div>
           </div>
         ) : (
