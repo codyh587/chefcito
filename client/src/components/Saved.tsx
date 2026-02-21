@@ -77,7 +77,9 @@ export function Saved() {
                   >
                     {/* title */}
                     <div className="mb-3.5 -ml-1.5 flex items-center gap-x-1">
-                      <div className="-translate-y-0.5 text-3xl">🍜</div>
+                      <div className="-translate-y-0.5 text-3xl">
+                        {recipe.emoji}
+                      </div>
                       <div className="text-lg font-semibold">
                         {recipe.recipe_title}
                       </div>
@@ -126,7 +128,9 @@ export function Saved() {
                 <DialogContent className="scrollbar-hide max-h-10/12 overflow-y-auto rounded-3xl border-4 border-yellow-500 select-none">
                   {/* title */}
                   <DialogTitle className="-mb-0.5 -ml-1.5 flex items-center gap-x-1">
-                    <div className="-translate-y-0.5 text-3xl">🍜</div>
+                    <div className="-translate-y-0.5 text-3xl">
+                      {recipe.emoji}
+                    </div>
                     {recipe.recipe_title}
                   </DialogTitle>
                   {/* category */}

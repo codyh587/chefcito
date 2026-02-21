@@ -113,7 +113,9 @@ export function Recipes() {
                   >
                     {/* title */}
                     <div className="mb-3.5 -ml-1.5 flex items-center gap-x-1">
-                      <div className="-translate-y-0.5 text-3xl">🍜</div>
+                      <div className="-translate-y-0.5 text-3xl">
+                        {recipe.emoji}
+                      </div>
                       <div className="text-lg font-semibold">
                         {recipe.recipe_title}
                       </div>
