@@ -181,7 +181,7 @@ def recommend(recipes, metas, idf, intent, liked, disliked, k=10):
     scored = []
 
     for r, meta in zip(recipes, metas):
-        if intent["pastry"] is not None and meta["pastry"] != intent["pastry"]:
+        if not intent["pastry"] and meta["pastry"]:
             continue
         if intent["protein_filled"] and not meta["protein_filled"]:
             continue
