@@ -2,12 +2,12 @@ import { useRef, useState } from "react";
 
 import {
   Check,
+  ClipboardCopy,
   Eraser,
   Loader2,
   Plus,
   ScanBarcode,
   Search,
-  Settings,
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -93,7 +93,7 @@ export function Pantry() {
           whileTap={{ scale: 0.9 }}
           className="mt-1 ml-7"
         >
-          <Settings size="2rem" />
+          <ClipboardCopy size="2rem" />
         </motion.button>
       </div>
       {/* search box */}
