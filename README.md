@@ -7,7 +7,7 @@
   <img src="./client/public/logo.svg" alt="Logo" height="200" />
 </div>
 
-## Built with:
+## Built With:
 
 <!-- https://github.com/Ileriayo/markdown-badges -->
 
